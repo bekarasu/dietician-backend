@@ -1,0 +1,34 @@
+services:
+  postgres:
+    container_name: dietician-postgres
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Qwe*123456
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - dietician_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    container_name: dietician-redis
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - dietician_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  dietician_postgres_data:
+  dietician_redis_data:
