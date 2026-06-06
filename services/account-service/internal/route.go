@@ -1,7 +1,7 @@
 package internal
 
 import (
-	"net/http"
+	"github.com/gofiber/fiber/v2"
 
 	"dietician.local/packages/middleware"
 	"dietician.local/services/account-service/internal/handler"
@@ -9,7 +9,7 @@ import (
 
 // RouteContext holds the dependencies passed into SetupRoutes.
 type RouteContext struct {
-	Mux *http.ServeMux
+	App *fiber.App
 }
 
 // IRoute is the contract every route group must satisfy.
@@ -30,23 +30,25 @@ func NewRoute(authHandler handler.IAuthHandler, profileHandler handler.IProfileH
 	}
 }
 
-// SetupRoutes registers all route groups on the mux.
+// SetupRoutes registers all route groups on the app.
 func (r *route) SetupRoutes(rc *RouteContext) {
-	r.authRoutes(rc.Mux)
-	r.profileRoutes(rc.Mux)
+	r.authRoutes(rc.App)
+	r.profileRoutes(rc.App)
 }
 
-func (r *route) authRoutes(mux *http.ServeMux) {
-	mux.HandleFunc("POST /api/v1/auth/register", r.authHandler.Register)
-	mux.HandleFunc("POST /api/v1/auth/verify-otp", r.authHandler.VerifyOTP)
-	mux.HandleFunc("POST /api/v1/auth/login", r.authHandler.Login)
-	mux.HandleFunc("POST /api/v1/auth/refresh", r.authHandler.Refresh)
-	mux.HandleFunc("GET /api/v1/auth/me", r.authHandler.Me)
+func (r *route) authRoutes(app *fiber.App) {
+	authGroup := app.Group("/api/v1/auth")
+	authGroup.Post("/register", r.authHandler.Register)
+	authGroup.Post("/verify-otp", r.authHandler.VerifyOTP)
+	authGroup.Post("/login", r.authHandler.Login)
+	authGroup.Post("/refresh", r.authHandler.Refresh)
 }
 
-func (r *route) profileRoutes(mux *http.ServeMux) {
-	mux.HandleFunc("GET /api/v1/profiles/{userId}", middleware.UserAuthMiddleware(r.profileHandler.GetProfile))
-	mux.HandleFunc("PUT /api/v1/profiles/{userId}", r.profileHandler.UpsertProfile)
-	mux.HandleFunc("GET /api/v1/profiles/{userId}/preferences", r.profileHandler.GetPreferences)
-	mux.HandleFunc("PUT /api/v1/profiles/{userId}/preferences", r.profileHandler.UpdatePreferences)
+func (r *route) profileRoutes(app *fiber.App) {
+	profileGroup := app.Group("/api/v1/profiles", middleware.UserAuthMiddleware)
+
+	profileGroup.Get("/", r.profileHandler.GetProfile)
+	profileGroup.Put("/", r.profileHandler.UpsertProfile)
+	profileGroup.Get("/preferences", r.profileHandler.GetPreferences)
+	profileGroup.Put("/preferences", r.profileHandler.UpdatePreferences)
 }

@@ -4,7 +4,8 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/hex"
-	"net/http"
+
+	"github.com/gofiber/fiber/v2"
 
 	"dietician.local/packages/constants"
 )
@@ -15,20 +16,17 @@ func generateRequestID() string {
 	return hex.EncodeToString(b)
 }
 
-func RequestIDMiddleware() func(http.Handler) http.Handler {
-	return func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			reqID := r.Header.Get("X-Request-Id")
-			if reqID == "" {
-				reqID = generateRequestID()
-			}
+func RequestIDMiddleware() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		reqID := c.Get("X-Request-Id")
+		if reqID == "" {
+			reqID = generateRequestID()
+		}
 
-			ctx := context.WithValue(r.Context(), constants.RequestIDKey, reqID)
-			r = r.WithContext(ctx)
+		ctx := context.WithValue(c.UserContext(), constants.RequestIDKey, reqID)
+		c.SetUserContext(ctx)
+		c.Set("X-Request-Id", reqID)
 
-			w.Header().Set("X-Request-Id", reqID)
-
-			next.ServeHTTP(w, r)
-		})
+		return c.Next()
 	}
 }

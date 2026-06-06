@@ -1,9 +1,9 @@
 package handler
 
 import (
-	"encoding/json"
-	"net/http"
+	"github.com/gofiber/fiber/v2"
 
+	"dietician.local/packages/middleware"
 	pkgresponse "dietician.local/packages/response"
 	"dietician.local/packages/validation"
 	"dietician.local/services/account-service/internal/dto/request"
@@ -11,10 +11,10 @@ import (
 )
 
 type IProfileHandler interface {
-	GetProfile(w http.ResponseWriter, r *http.Request)
-	UpsertProfile(w http.ResponseWriter, r *http.Request)
-	GetPreferences(w http.ResponseWriter, r *http.Request)
-	UpdatePreferences(w http.ResponseWriter, r *http.Request)
+	GetProfile(c *fiber.Ctx) error
+	UpsertProfile(c *fiber.Ctx) error
+	GetPreferences(c *fiber.Ctx) error
+	UpdatePreferences(c *fiber.Ctx) error
 }
 
 type ProfileHandler struct {
@@ -25,88 +25,67 @@ func NewProfileHandler(profileService *profileservice.ProfileService) IProfileHa
 	return &ProfileHandler{profileService: profileService}
 }
 
-func (h *ProfileHandler) GetProfile(w http.ResponseWriter, r *http.Request) {
-	userID := r.PathValue("userId")
-	if userID == "" {
-		pkgresponse.Error(w, http.StatusBadRequest, "user ID is required")
-		return
-	}
+func (h *ProfileHandler) GetProfile(c *fiber.Ctx) error {
+	userID := middleware.GetUserID(c.UserContext())
 
-	profile, err := h.profileService.GetProfile(r.Context(), userID)
+	profile, err := h.profileService.GetProfile(c.UserContext(), userID)
 	if err != nil {
-		pkgresponse.Error(w, http.StatusNotFound, err.Error())
-		return
+		return pkgresponse.Error(c, fiber.StatusNotFound, err.Error())
 	}
 
-	pkgresponse.Success(w, "profile fetched", profile.ToResource())
+	return pkgresponse.Success(c, "profile fetched", profile.ToResource())
 }
 
-func (h *ProfileHandler) UpsertProfile(w http.ResponseWriter, r *http.Request) {
-	userID := r.PathValue("userId")
-	if userID == "" {
-		pkgresponse.Error(w, http.StatusBadRequest, "user ID is required")
-		return
-	}
+func (h *ProfileHandler) UpsertProfile(c *fiber.Ctx) error {
+	userID := middleware.GetUserID(c.UserContext())
 
 	var req request.UpdateProfileRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		pkgresponse.Error(w, http.StatusBadRequest, "invalid request body")
-		return
+	if err := c.BodyParser(&req); err != nil {
+		return pkgresponse.Error(c, fiber.StatusBadRequest, "invalid request body")
 	}
 
 	if err := validation.Validate.Struct(req); err != nil {
-		pkgresponse.Error(w, http.StatusBadRequest, validation.FormatValidationError(r.Context(), err))
-		return
+		return pkgresponse.Error(c, fiber.StatusBadRequest, validation.FormatValidationError(c.UserContext(), err))
 	}
 
-	profile, err := h.profileService.UpsertProfile(r.Context(), userID, req.ToDomain())
+	profile, err := h.profileService.UpsertProfile(c.UserContext(), userID, req.ToDomain())
 	if err != nil {
-		pkgresponse.Error(w, http.StatusInternalServerError, err.Error())
-		return
+		return pkgresponse.Error(c, fiber.StatusInternalServerError, err.Error())
 	}
 
-	pkgresponse.Success(w, "profile updated", profile.ToResource())
+	return pkgresponse.Success(c, "profile updated", profile.ToResource())
 }
 
-func (h *ProfileHandler) GetPreferences(w http.ResponseWriter, r *http.Request) {
-	userID := r.PathValue("userId")
-	if userID == "" {
-		pkgresponse.Error(w, http.StatusBadRequest, "user ID is required")
-		return
-	}
+func (h *ProfileHandler) GetPreferences(c *fiber.Ctx) error {
+	userID := middleware.GetUserID(c.UserContext())
 
-	prefs, err := h.profileService.GetPreferences(r.Context(), userID)
+	prefs, err := h.profileService.GetPreferences(c.UserContext(), userID)
 	if err != nil {
-		pkgresponse.Error(w, http.StatusInternalServerError, err.Error())
-		return
+		return pkgresponse.Error(c, fiber.StatusInternalServerError, err.Error())
 	}
 
-	pkgresponse.Success(w, "preferences fetched", prefs.ToResource())
+	return pkgresponse.Success(c, "preferences fetched", prefs.ToResource())
 }
 
-func (h *ProfileHandler) UpdatePreferences(w http.ResponseWriter, r *http.Request) {
-	userID := r.PathValue("userId")
+func (h *ProfileHandler) UpdatePreferences(c *fiber.Ctx) error {
+	userID := middleware.GetUserID(c.UserContext())
 	if userID == "" {
-		pkgresponse.Error(w, http.StatusBadRequest, "user ID is required")
-		return
+		return pkgresponse.Error(c, fiber.StatusBadRequest, "user ID is required")
 	}
 
 	var req request.UpdatePreferencesRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		pkgresponse.Error(w, http.StatusBadRequest, "invalid request body")
-		return
+	if err := c.BodyParser(&req); err != nil {
+		return pkgresponse.Error(c, fiber.StatusBadRequest, "invalid request body")
 	}
 
 	if err := validation.Validate.Struct(req); err != nil {
-		pkgresponse.Error(w, http.StatusBadRequest, validation.FormatValidationError(r.Context(), err))
-		return
+		return pkgresponse.Error(c, fiber.StatusBadRequest, validation.FormatValidationError(c.UserContext(), err))
 	}
 
-	prefs, err := h.profileService.UpdatePreferences(r.Context(), userID, req.ToDomain())
+	prefs, err := h.profileService.UpdatePreferences(c.UserContext(), userID, req.ToDomain())
 	if err != nil {
-		pkgresponse.Error(w, http.StatusInternalServerError, err.Error())
-		return
+		return pkgresponse.Error(c, fiber.StatusInternalServerError, err.Error())
 	}
 
-	pkgresponse.Success(w, "preferences updated", prefs.ToResource())
+	return pkgresponse.Success(c, "preferences updated", prefs.ToResource())
 }

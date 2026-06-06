@@ -2,8 +2,9 @@ package middleware
 
 import (
 	"context"
-	"net/http"
 	"strings"
+
+	"github.com/gofiber/fiber/v2"
 
 	"dietician.local/packages/constants"
 	"dietician.local/packages/response"
@@ -17,19 +18,8 @@ func GetUserID(ctx context.Context) string {
 	return ""
 }
 
-func ExtractUserIDMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		userID := r.Header.Get("X-User-ID")
-		if userID != "" {
-			ctx := context.WithValue(r.Context(), constants.UserIDKey, userID)
-			r = r.WithContext(ctx)
-		}
-		next.ServeHTTP(w, r)
-	})
-}
-
-func ExtractBearerToken(r *http.Request) string {
-	auth := r.Header.Get("Authorization")
+func ExtractBearerToken(c *fiber.Ctx) string {
+	auth := c.Get("Authorization")
 	if auth == "" {
 		return ""
 	}
@@ -40,45 +30,39 @@ func ExtractBearerToken(r *http.Request) string {
 	return parts[1]
 }
 
-func UserAuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		tok, ok := r.Context().Value(constants.TokenizerKey).(tokenizer.ITokenizer)
-		if !ok || tok == nil {
-			response.Error(w, http.StatusInternalServerError, "tokenizer not configured")
-			return
-		}
+func UserAuthMiddleware(c *fiber.Ctx) error {
+	tok, ok := c.Locals(constants.TokenizerKey).(tokenizer.ITokenizer)
+	if !ok || tok == nil {
+		return response.Error(c, fiber.StatusInternalServerError, "tokenizer not configured")
+	}
 
-		tokenStr := ExtractBearerToken(r)
-			if tokenStr == "" {
-				response.Error(w, http.StatusUnauthorized, "unauthorized")
-				return
-			}
+	tokenStr := ExtractBearerToken(c)
+	if tokenStr == "" {
+		return response.Error(c, fiber.StatusUnauthorized, "unauthorized")
+	}
 
-			valid, err := tok.IsJWTInRedis(r.Context(), tokenStr)
-			if err != nil || !valid {
-				response.Error(w, http.StatusUnauthorized, "token revoked or not found in redis")
-				return
-			}
+	valid, err := tok.IsJWTInRedis(c.UserContext(), tokenStr)
+	if err != nil || !valid {
+		return response.Error(c, fiber.StatusUnauthorized, "token revoked or not found in redis")
+	}
 
-			jwtToken, err := tok.VerifyJWT(tokenStr)
-			if err != nil {
-				response.Error(w, http.StatusUnauthorized, "invalid token signature")
-				return
-			}
+	jwtToken, err := tok.VerifyJWT(tokenStr)
+	if err != nil {
+		return response.Error(c, fiber.StatusUnauthorized, "invalid token signature")
+	}
 
-			claims, err := tok.ExtractClaims(jwtToken)
-			if err != nil {
-				response.Error(w, http.StatusUnauthorized, "invalid token claims")
-				return
-			}
+	claims, err := tok.ExtractClaims(jwtToken)
+	if err != nil {
+		return response.Error(c, fiber.StatusUnauthorized, "invalid token claims")
+	}
 
-			userID, ok := claims["sub"].(string)
-			if !ok || userID == "" {
-				response.Error(w, http.StatusUnauthorized, "invalid user id in token")
-				return
-			}
+	userID, ok := claims["sub"].(string)
+	if !ok || userID == "" {
+		return response.Error(c, fiber.StatusUnauthorized, "invalid user id in token")
+	}
 
-			ctx := context.WithValue(r.Context(), constants.UserIDKey, userID)
-			next.ServeHTTP(w, r.WithContext(ctx))
-		}
+	ctx := context.WithValue(c.UserContext(), constants.UserIDKey, userID)
+	c.SetUserContext(ctx)
+
+	return c.Next()
 }

@@ -1,8 +1,7 @@
 package response
 
 import (
-	"encoding/json"
-	"net/http"
+	"github.com/gofiber/fiber/v2"
 )
 
 type ErrorResponse struct {
@@ -17,21 +16,19 @@ type SuccessResponse struct {
 	Data    interface{} `json:"data"`
 }
 
-func JSON(w http.ResponseWriter, status int, data interface{}) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(status)
-	return json.NewEncoder(w).Encode(data)
+func JSON(c *fiber.Ctx, status int, data interface{}) error {
+	return c.Status(status).JSON(data)
 }
 
-func Error(w http.ResponseWriter, status int, errMsg string) error {
-	reqID := w.Header().Get("X-Request-ID")
-	return JSON(w, status, ErrorResponse{
+func Error(c *fiber.Ctx, status int, errMsg string) error {
+	reqID := c.GetRespHeader("X-Request-Id")
+	return JSON(c, status, ErrorResponse{
 		Error:     errMsg,
 		Code:      status,
 		RequestID: reqID,
 	})
 }
 
-func Success(w http.ResponseWriter, message string, data interface{}) error {
-	return JSON(w, http.StatusOK, SuccessResponse{Message: message, Data: data})
+func Success(c *fiber.Ctx, message string, data interface{}) error {
+	return JSON(c, fiber.StatusOK, SuccessResponse{Message: message, Data: data})
 }

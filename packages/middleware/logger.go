@@ -1,16 +1,15 @@
 package middleware
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
 	"time"
 
-	"dietician.local/packages/constants"
+	"github.com/gofiber/fiber/v2"
 	"github.com/sirupsen/logrus"
+
+	"dietician.local/packages/constants"
 )
 
 var (
@@ -20,76 +19,48 @@ var (
 	}
 )
 
-type responseWriterWrapper struct {
-	http.ResponseWriter
-	status int
-	body   *bytes.Buffer
-}
+func LoggerMiddleware(l *logrus.Logger) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		t := time.Now()
 
-func (rw *responseWriterWrapper) WriteHeader(status int) {
-	rw.status = status
-	rw.ResponseWriter.WriteHeader(status)
-}
+		requestFields := getRequestLogFields(c)
 
-func (rw *responseWriterWrapper) Write(b []byte) (int, error) {
-	rw.body.Write(b)
-	return rw.ResponseWriter.Write(b)
-}
+		ctx := context.WithValue(c.UserContext(), constants.RequestLogFieldsKey, requestFields)
+		c.SetUserContext(ctx)
 
-func LoggerMiddleware(l *logrus.Logger) func(http.Handler) http.Handler {
-	return func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			t := time.Now()
+		if isExcludedPath(c.Path()) {
+			return c.Next()
+		}
 
-			requestFields := getRequestLogFields(r)
+		err := c.Next()
 
-			ctx := context.WithValue(r.Context(), constants.RequestLogFieldsKey, requestFields)
-			r = r.WithContext(ctx)
+		respBody := c.Response().Body()
+		respStatus := c.Response().StatusCode()
 
-			if isExcludedPath(r.URL.Path) {
-				next.ServeHTTP(w, r)
-				return
-			}
+		fields := logrus.Fields{
+			"request":  requestFields,
+			"response": getResponseLogFields(respBody, respStatus, t),
+		}
 
-			rw := &responseWriterWrapper{
-				ResponseWriter: w,
-				status:         http.StatusOK, // Default to 200
-				body:           &bytes.Buffer{},
-			}
+		if nrCtx, ok := c.UserContext().Value(constants.NewrelicContextKey).(context.Context); ok {
+			l.WithContext(nrCtx).WithFields(fields).Info("weblogger")
+		} else {
+			l.WithFields(fields).Info("weblogger")
+		}
 
-			next.ServeHTTP(rw, r)
-
-			respBody := rw.body.Bytes()
-			respStatus := rw.status
-
-			fields := logrus.Fields{
-				"request":  requestFields,
-				"response": getResponseLogFields(respBody, respStatus, t),
-			}
-
-			if nrCtx, ok := r.Context().Value(constants.NewrelicContextKey).(context.Context); ok {
-				l.WithContext(nrCtx).WithFields(fields).Info("weblogger")
-			} else {
-				l.WithFields(fields).Info("weblogger")
-			}
-		})
+		return err
 	}
 }
 
-func getRequestLogFields(r *http.Request) logrus.Fields {
-	var bodyBytes []byte
-
-	if r.Body != nil {
-		bodyBytes, _ = io.ReadAll(r.Body)
-		r.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
-	}
+func getRequestLogFields(c *fiber.Ctx) logrus.Fields {
+	bodyBytes := c.Body()
 
 	fields := logrus.Fields{
-		"id":      r.Context().Value(constants.RequestIDKey),
-		"method":  r.Method,
-		"path":    r.URL.Path,
-		"url":     r.RequestURI,
-		"headers": parseRequestHeaders(r),
+		"id":      c.UserContext().Value(constants.RequestIDKey),
+		"method":  c.Method(),
+		"path":    c.Path(),
+		"url":     string(c.Request().RequestURI()),
+		"headers": parseRequestHeaders(c),
 		"body":    unmarshalBody(bodyBytes),
 	}
 
@@ -104,16 +75,15 @@ func getResponseLogFields(body []byte, status int, t time.Time) logrus.Fields {
 	}
 }
 
-func parseRequestHeaders(r *http.Request) map[string]interface{} {
+func parseRequestHeaders(c *fiber.Ctx) map[string]interface{} {
 	headers := make(map[string]interface{})
 
-	for k, v := range r.Header {
-		if !isExcludedHeaderKey(k) {
-			if len(v) > 0 {
-				headers[k] = v[0]
-			}
+	c.Request().Header.VisitAll(func(k, v []byte) {
+		key := string(k)
+		if !isExcludedHeaderKey(key) {
+			headers[key] = string(v)
 		}
-	}
+	})
 
 	return headers
 }

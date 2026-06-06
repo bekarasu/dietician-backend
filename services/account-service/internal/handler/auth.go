@@ -1,23 +1,21 @@
 package handler
 
 import (
-	"encoding/json"
-	"net/http"
+	"github.com/gofiber/fiber/v2"
 
 	pkgresponse "dietician.local/packages/response"
+	"dietician.local/packages/validation"
 	"dietician.local/services/account-service/internal/auth/model"
 	"dietician.local/services/account-service/internal/auth/service"
 	"dietician.local/services/account-service/internal/dto/request"
 	"dietician.local/services/account-service/internal/dto/response"
-	"dietician.local/packages/validation"
 )
 
 type IAuthHandler interface {
-	Register(w http.ResponseWriter, r *http.Request)
-	VerifyOTP(w http.ResponseWriter, r *http.Request)
-	Login(w http.ResponseWriter, r *http.Request)
-	Refresh(w http.ResponseWriter, r *http.Request)
-	Me(w http.ResponseWriter, r *http.Request)
+	Register(c *fiber.Ctx) error
+	VerifyOTP(c *fiber.Ctx) error
+	Login(c *fiber.Ctx) error
+	Refresh(c *fiber.Ctx) error
 }
 
 type AuthHandler struct {
@@ -28,16 +26,14 @@ func NewAuthHandler(authService service.IUserService) IAuthHandler {
 	return &AuthHandler{authService: authService}
 }
 
-func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
+func (h *AuthHandler) Register(c *fiber.Ctx) error {
 	var req request.RegisterRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		pkgresponse.Error(w, http.StatusBadRequest, "invalid request body")
-		return
+	if err := c.BodyParser(&req); err != nil {
+		return pkgresponse.Error(c, fiber.StatusBadRequest, "invalid request body")
 	}
 
 	if err := validation.Validate.Struct(req); err != nil {
-		pkgresponse.Error(w, http.StatusBadRequest, validation.FormatValidationError(r.Context(), err))
-		return
+		return pkgresponse.Error(c, fiber.StatusBadRequest, validation.FormatValidationError(c.UserContext(), err))
 	}
 
 	svcReq := model.RegisterRequest{
@@ -47,29 +43,26 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 		LastName:  req.LastName,
 	}
 
-	resp, err := h.authService.Register(r.Context(), svcReq)
+	resp, err := h.authService.Register(c.UserContext(), svcReq)
 	if err != nil {
-		pkgresponse.Error(w, http.StatusBadRequest, err.Error())
-		return
+		return pkgresponse.Error(c, fiber.StatusBadRequest, err.Error())
 	}
 
 	dtoResp := response.RegisterResponse{
 		OTPToken: resp.OTPToken,
 	}
 
-	pkgresponse.JSON(w, http.StatusAccepted, pkgresponse.SuccessResponse{Message: "OTP sent to email", Data: dtoResp})
+	return pkgresponse.JSON(c, fiber.StatusAccepted, pkgresponse.SuccessResponse{Message: "OTP sent to email", Data: dtoResp})
 }
 
-func (h *AuthHandler) VerifyOTP(w http.ResponseWriter, r *http.Request) {
+func (h *AuthHandler) VerifyOTP(c *fiber.Ctx) error {
 	var req request.VerifyOTPRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		pkgresponse.Error(w, http.StatusBadRequest, "invalid request body")
-		return
+	if err := c.BodyParser(&req); err != nil {
+		return pkgresponse.Error(c, fiber.StatusBadRequest, "invalid request body")
 	}
 
 	if err := validation.Validate.Struct(req); err != nil {
-		pkgresponse.Error(w, http.StatusBadRequest, validation.FormatValidationError(r.Context(), err))
-		return
+		return pkgresponse.Error(c, fiber.StatusBadRequest, validation.FormatValidationError(c.UserContext(), err))
 	}
 
 	svcReq := model.VerifyOTPRequest{
@@ -77,10 +70,9 @@ func (h *AuthHandler) VerifyOTP(w http.ResponseWriter, r *http.Request) {
 		OTP:      req.OTP,
 	}
 
-	resp, err := h.authService.VerifyOTP(r.Context(), svcReq)
+	resp, err := h.authService.VerifyOTP(c.UserContext(), svcReq)
 	if err != nil {
-		pkgresponse.Error(w, http.StatusBadRequest, err.Error())
-		return
+		return pkgresponse.Error(c, fiber.StatusBadRequest, err.Error())
 	}
 
 	dtoResp := response.AuthResponse{
@@ -88,19 +80,17 @@ func (h *AuthHandler) VerifyOTP(w http.ResponseWriter, r *http.Request) {
 		RefreshToken: resp.RefreshToken,
 	}
 
-	pkgresponse.Success(w, "OTP verified successfully", dtoResp)
+	return pkgresponse.Success(c, "OTP verified successfully", dtoResp)
 }
 
-func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
+func (h *AuthHandler) Login(c *fiber.Ctx) error {
 	var req request.LoginRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		pkgresponse.Error(w, http.StatusBadRequest, "invalid request body")
-		return
+	if err := c.BodyParser(&req); err != nil {
+		return pkgresponse.Error(c, fiber.StatusBadRequest, "invalid request body")
 	}
 
 	if err := validation.Validate.Struct(req); err != nil {
-		pkgresponse.Error(w, http.StatusBadRequest, validation.FormatValidationError(r.Context(), err))
-		return
+		return pkgresponse.Error(c, fiber.StatusBadRequest, validation.FormatValidationError(c.UserContext(), err))
 	}
 
 	svcReq := model.LoginRequest{
@@ -108,10 +98,9 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		Password: req.Password,
 	}
 
-	resp, err := h.authService.Login(r.Context(), svcReq)
+	resp, err := h.authService.Login(c.UserContext(), svcReq)
 	if err != nil {
-		pkgresponse.Error(w, http.StatusUnauthorized, err.Error())
-		return
+		return pkgresponse.Error(c, fiber.StatusUnauthorized, err.Error())
 	}
 
 	dtoResp := response.AuthResponse{
@@ -119,29 +108,26 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		RefreshToken: resp.RefreshToken,
 	}
 
-	pkgresponse.Success(w, "login successful", dtoResp)
+	return pkgresponse.Success(c, "login successful", dtoResp)
 }
 
-func (h *AuthHandler) Refresh(w http.ResponseWriter, r *http.Request) {
+func (h *AuthHandler) Refresh(c *fiber.Ctx) error {
 	var req request.RefreshRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		pkgresponse.Error(w, http.StatusBadRequest, "invalid request body")
-		return
+	if err := c.BodyParser(&req); err != nil {
+		return pkgresponse.Error(c, fiber.StatusBadRequest, "invalid request body")
 	}
 
 	if err := validation.Validate.Struct(req); err != nil {
-		pkgresponse.Error(w, http.StatusBadRequest, validation.FormatValidationError(r.Context(), err))
-		return
+		return pkgresponse.Error(c, fiber.StatusBadRequest, validation.FormatValidationError(c.UserContext(), err))
 	}
 
 	svcReq := model.RefreshRequest{
 		RefreshToken: req.RefreshToken,
 	}
 
-	resp, err := h.authService.Refresh(r.Context(), svcReq)
+	resp, err := h.authService.Refresh(c.UserContext(), svcReq)
 	if err != nil {
-		pkgresponse.Error(w, http.StatusUnauthorized, err.Error())
-		return
+		return pkgresponse.Error(c, fiber.StatusUnauthorized, err.Error())
 	}
 
 	dtoResp := response.AuthResponse{
@@ -149,31 +135,5 @@ func (h *AuthHandler) Refresh(w http.ResponseWriter, r *http.Request) {
 		RefreshToken: resp.RefreshToken,
 	}
 
-	pkgresponse.Success(w, "token refreshed", dtoResp)
-}
-
-func (h *AuthHandler) Me(w http.ResponseWriter, r *http.Request) {
-	userID := r.Header.Get("X-User-ID")
-	if userID == "" {
-		pkgresponse.Error(w, http.StatusUnauthorized, "missing user ID")
-		return
-	}
-
-	user, err := h.authService.GetMe(r.Context(), userID)
-	if err != nil {
-		pkgresponse.Error(w, http.StatusNotFound, err.Error())
-		return
-	}
-
-	dtoUser := &response.User{
-		ID:         user.ID,
-		Email:      user.Email,
-		FirstName:  user.FirstName,
-		LastName:   user.LastName,
-		IsVerified: user.IsVerified,
-		CreatedAt:  user.CreatedAt,
-		UpdatedAt:  user.UpdatedAt,
-	}
-
-	pkgresponse.Success(w, "user fetched", dtoUser)
+	return pkgresponse.Success(c, "token refreshed", dtoResp)
 }
