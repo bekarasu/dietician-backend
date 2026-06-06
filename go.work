@@ -3,9 +3,9 @@ go 1.26
 use (
 	./packages
 	./services/account-service
-	// ./services/gateway
-	// ./services/medical-service
-	// ./services/progress-service
-	// ./services/recommendation-service
-	// ./services/tracking-service
+// ./services/gateway
+// ./services/medical-service
+// ./services/progress-service
+// ./services/recommendation-service
+// ./services/tracking-service
 )
