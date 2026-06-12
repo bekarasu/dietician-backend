@@ -26,6 +26,16 @@ func NewAuthHandler(authService service.IUserService) IAuthHandler {
 	return &AuthHandler{authService: authService}
 }
 
+// Register creates a new user account and sends an OTP.
+// @Summary Register a new user
+// @Description Register a new user and send an OTP
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param request body request.RegisterRequest true "Register Request"
+// @Success 202 {object} pkgresponse.SuccessResponse{data=response.RegisterResponse}
+// @Failure 400 {object} pkgresponse.ErrorResponse
+// @Router /api/v1/auth/register [post]
 func (h *AuthHandler) Register(c *fiber.Ctx) error {
 	var req request.RegisterRequest
 	if err := c.BodyParser(&req); err != nil {
@@ -55,6 +65,16 @@ func (h *AuthHandler) Register(c *fiber.Ctx) error {
 	return pkgresponse.JSON(c, fiber.StatusAccepted, pkgresponse.SuccessResponse{Message: "OTP sent to email", Data: dtoResp})
 }
 
+// VerifyOTP verifies the given OTP for a user.
+// @Summary Verify OTP
+// @Description Verify OTP for a registered user
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param request body request.VerifyOTPRequest true "Verify OTP Request"
+// @Success 200 {object} pkgresponse.SuccessResponse{data=response.AuthResponse}
+// @Failure 400 {object} pkgresponse.ErrorResponse
+// @Router /api/v1/auth/verify-otp [post]
 func (h *AuthHandler) VerifyOTP(c *fiber.Ctx) error {
 	var req request.VerifyOTPRequest
 	if err := c.BodyParser(&req); err != nil {
@@ -83,6 +103,17 @@ func (h *AuthHandler) VerifyOTP(c *fiber.Ctx) error {
 	return pkgresponse.Success(c, "OTP verified successfully", dtoResp)
 }
 
+// Login authenticates a user and returns tokens.
+// @Summary Login
+// @Description Authenticate user and return tokens
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param request body request.LoginRequest true "Login Request"
+// @Success 200 {object} pkgresponse.SuccessResponse{data=response.AuthResponse}
+// @Failure 400 {object} pkgresponse.ErrorResponse
+// @Failure 401 {object} pkgresponse.ErrorResponse
+// @Router /api/v1/auth/login [post]
 func (h *AuthHandler) Login(c *fiber.Ctx) error {
 	var req request.LoginRequest
 	if err := c.BodyParser(&req); err != nil {
@@ -111,6 +142,17 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 	return pkgresponse.Success(c, "login successful", dtoResp)
 }
 
+// Refresh generates new tokens from a refresh token.
+// @Summary Refresh Token
+// @Description Refresh access token using refresh token
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param request body request.RefreshRequest true "Refresh Request"
+// @Success 200 {object} pkgresponse.SuccessResponse{data=response.AuthResponse}
+// @Failure 400 {object} pkgresponse.ErrorResponse
+// @Failure 401 {object} pkgresponse.ErrorResponse
+// @Router /api/v1/auth/refresh [post]
 func (h *AuthHandler) Refresh(c *fiber.Ctx) error {
 	var req request.RefreshRequest
 	if err := c.BodyParser(&req); err != nil {

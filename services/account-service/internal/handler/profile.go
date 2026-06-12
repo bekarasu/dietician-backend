@@ -25,6 +25,17 @@ func NewProfileHandler(profileService *profileservice.ProfileService) IProfileHa
 	return &ProfileHandler{profileService: profileService}
 }
 
+// GetProfile retrieves the authenticated user's profile.
+// @Summary Get User Profile
+// @Description Retrieve the profile of the authenticated user
+// @Tags Profile
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} pkgresponse.SuccessResponse{data=response.UserProfile}
+// @Failure 401 {object} pkgresponse.ErrorResponse
+// @Failure 404 {object} pkgresponse.ErrorResponse
+// @Router /api/v1/profiles [get]
 func (h *ProfileHandler) GetProfile(c *fiber.Ctx) error {
 	userID := middleware.GetUserID(c.UserContext())
 
@@ -36,6 +47,19 @@ func (h *ProfileHandler) GetProfile(c *fiber.Ctx) error {
 	return pkgresponse.Success(c, "profile fetched", profile.ToResource())
 }
 
+// UpsertProfile updates or creates the user's profile.
+// @Summary Update User Profile
+// @Description Update or create the profile for the authenticated user
+// @Tags Profile
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body request.UpdateProfileRequest true "Update Profile Request"
+// @Success 200 {object} pkgresponse.SuccessResponse{data=response.UserProfile}
+// @Failure 400 {object} pkgresponse.ErrorResponse
+// @Failure 401 {object} pkgresponse.ErrorResponse
+// @Failure 500 {object} pkgresponse.ErrorResponse
+// @Router /api/v1/profiles [put]
 func (h *ProfileHandler) UpsertProfile(c *fiber.Ctx) error {
 	userID := middleware.GetUserID(c.UserContext())
 
@@ -56,6 +80,17 @@ func (h *ProfileHandler) UpsertProfile(c *fiber.Ctx) error {
 	return pkgresponse.Success(c, "profile updated", profile.ToResource())
 }
 
+// GetPreferences retrieves the user's preferences.
+// @Summary Get User Preferences
+// @Description Retrieve the preferences of the authenticated user
+// @Tags Profile
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} pkgresponse.SuccessResponse{data=response.PreferencesResponse}
+// @Failure 401 {object} pkgresponse.ErrorResponse
+// @Failure 500 {object} pkgresponse.ErrorResponse
+// @Router /api/v1/profiles/preferences [get]
 func (h *ProfileHandler) GetPreferences(c *fiber.Ctx) error {
 	userID := middleware.GetUserID(c.UserContext())
 
@@ -67,6 +102,19 @@ func (h *ProfileHandler) GetPreferences(c *fiber.Ctx) error {
 	return pkgresponse.Success(c, "preferences fetched", prefs.ToResource())
 }
 
+// UpdatePreferences updates the user's preferences.
+// @Summary Update User Preferences
+// @Description Update the preferences for the authenticated user
+// @Tags Profile
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body request.UpdatePreferencesRequest true "Update Preferences Request"
+// @Success 200 {object} pkgresponse.SuccessResponse{data=response.PreferencesResponse}
+// @Failure 400 {object} pkgresponse.ErrorResponse
+// @Failure 401 {object} pkgresponse.ErrorResponse
+// @Failure 500 {object} pkgresponse.ErrorResponse
+// @Router /api/v1/profiles/preferences [put]
 func (h *ProfileHandler) UpdatePreferences(c *fiber.Ctx) error {
 	userID := middleware.GetUserID(c.UserContext())
 	if userID == "" {

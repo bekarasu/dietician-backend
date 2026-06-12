@@ -12,9 +12,11 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"dietician.local/packages/middleware"
+	"dietician.local/packages/swagger"
 	"dietician.local/packages/tokenizer"
 	accountservice "dietician.local/services/account-service"
 	"dietician.local/services/account-service/config"
+	_ "dietician.local/services/account-service/docs"
 	"dietician.local/services/account-service/internal"
 	"dietician.local/services/account-service/internal/auth/service"
 )
@@ -49,6 +51,9 @@ func initApplication(a *application) *Server {
 
 	route := accountservice.InitRoute(a.db, a.cfg, a.smtpSender, a.rdb, a.tokenizer)
 	route.SetupRoutes(&internal.RouteContext{App: srv.srv})
+
+	// Setup Swagger UI
+	swagger.Setup(srv.srv, "/swagger")
 
 	return srv
 }
