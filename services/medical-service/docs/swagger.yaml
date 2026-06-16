@@ -1,0 +1,14 @@
+basePath: /
+host: localhost:8085
+info:
+  contact: {}
+  description: This is the medical service for the dietician backend.
+  title: Medical Service API
+  version: "1.0"
+paths: {}
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
