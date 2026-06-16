@@ -1,0 +1,7 @@
+[validation]
+required = "{{.Field}} alanı zorunludur"
+email = "{{.Field}} geçerli bir e-posta adresi olmalıdır"
+min = "{{.Field}} en az {{.Param}} karakter olmalıdır"
+len = "{{.Field}} tam olarak {{.Param}} karakter olmalıdır"
+gt = "{{.Field}}, {{.Param}} değerinden büyük olmalıdır"
+datetime = "{{.Field}} geçerli bir tarih/saat formatında olmalıdır"

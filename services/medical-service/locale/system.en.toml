@@ -1,0 +1,7 @@
+not_found = "Not found!"
+unexpected_error = "An unexpected error has occurred."
+validation_failed = "The given data was invalid."
+unauthorized = "Authentication failed."
+body_parser_failed = "The given values could not be parsed."
+client_id_invalid = "Client Id is invalid."
+processing_error = "An error occurred while processing the request. Please retry the request."
