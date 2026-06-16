@@ -26,6 +26,19 @@ func NewMedicalHandler(medService service.IMedicalService) IMedicalHandler {
 	}
 }
 
+// CreateUpload creates a new medical upload record.
+// @Summary Create Medical Upload
+// @Description Create a new medical upload record for a user
+// @Tags Medical Uploads
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param userId path string true "User ID"
+// @Param request body service.CreateUploadRequest true "Create Upload Request"
+// @Success 200 {object} response.SuccessResponse{data=repository.MedicalUpload}
+// @Failure 400 {object} response.ErrorResponse
+// @Failure 500 {object} response.ErrorResponse
+// @Router /api/v1/medical/{userId}/uploads [post]
 func (h *medicalHandler) CreateUpload(c *fiber.Ctx) error {
 	userID := c.Params("userId")
 	var req service.CreateUploadRequest
@@ -42,6 +55,17 @@ func (h *medicalHandler) CreateUpload(c *fiber.Ctx) error {
 	return response.Success(c, "upload created successfully", res)
 }
 
+// ListUploads retrieves all medical uploads for a user.
+// @Summary List Medical Uploads
+// @Description Retrieve a list of medical uploads for a specific user
+// @Tags Medical Uploads
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param userId path string true "User ID"
+// @Success 200 {object} response.SuccessResponse{data=[]repository.MedicalUpload}
+// @Failure 500 {object} response.ErrorResponse
+// @Router /api/v1/medical/{userId}/uploads [get]
 func (h *medicalHandler) ListUploads(c *fiber.Ctx) error {
 	userID := c.Params("userId")
 
@@ -53,6 +77,19 @@ func (h *medicalHandler) ListUploads(c *fiber.Ctx) error {
 	return response.Success(c, "uploads retrieved successfully", res)
 }
 
+// GetUploadDetail retrieves the details of a specific medical upload.
+// @Summary Get Medical Upload Details
+// @Description Retrieve the details of a specific medical upload, including file metadata
+// @Tags Medical Uploads
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param userId path string true "User ID"
+// @Param uploadId path int true "Upload ID"
+// @Success 200 {object} response.SuccessResponse{data=service.UploadDetailResponse}
+// @Failure 400 {object} response.ErrorResponse
+// @Failure 500 {object} response.ErrorResponse
+// @Router /api/v1/medical/{userId}/uploads/{uploadId} [get]
 func (h *medicalHandler) GetUploadDetail(c *fiber.Ctx) error {
 	userID := c.Params("userId")
 	uploadID, err := strconv.ParseInt(c.Params("uploadId"), 10, 64)
@@ -68,6 +105,19 @@ func (h *medicalHandler) GetUploadDetail(c *fiber.Ctx) error {
 	return response.Success(c, "upload details retrieved successfully", res)
 }
 
+// DeleteUpload deletes a specific medical upload and its associated files.
+// @Summary Delete Medical Upload
+// @Description Delete a specific medical upload and its associated files
+// @Tags Medical Uploads
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param userId path string true "User ID"
+// @Param uploadId path int true "Upload ID"
+// @Success 200 {object} response.SuccessResponse
+// @Failure 400 {object} response.ErrorResponse
+// @Failure 500 {object} response.ErrorResponse
+// @Router /api/v1/medical/{userId}/uploads/{uploadId} [delete]
 func (h *medicalHandler) DeleteUpload(c *fiber.Ctx) error {
 	userID := c.Params("userId")
 	uploadID, err := strconv.ParseInt(c.Params("uploadId"), 10, 64)

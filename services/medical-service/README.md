@@ -32,8 +32,8 @@ Currently using a no-op implementation. Real S3/MinIO can be added later.
 
 ## Environment Variables
 
-- `MEDICAL_SERVICE_PORT` - Service port (default: 8085)
-- `MEDICAL_DB_NAME` - PostgreSQL database name
+- `APP_PORT` - Service port (default: 8085)
+- `APP_NAME` - Service name (default: medical-service)
 - `POSTGRES_*` - PostgreSQL connection settings
 - `REDIS_*` - Redis connection settings
 

@@ -19,9 +19,8 @@ Handles user authentication and authorization.
 
 ## Environment Variables
 
-- `AUTH_SERVICE_PORT` - Service port (default: 8081)
+- `APP_PORT` - Service port (default: 8081)
 - `JWT_SECRET` - Secret key for JWT signing
-- `POSTGRES_DB_NAME` - PostgreSQL database name
 - `POSTGRES_*` - PostgreSQL connection settings
 - `REDIS_*` - Redis connection settings
 

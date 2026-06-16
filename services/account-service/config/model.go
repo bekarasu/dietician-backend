@@ -11,7 +11,7 @@ type Credentials struct {
 
 type WebConfig struct {
 	AppName  string `mapstructure:"APP_NAME"`
-	Port     string `mapstructure:"AUTH_SERVICE_PORT"`
+	Port     string `mapstructure:"APP_PORT"`
 	Env      string `mapstructure:"APP_ENV"`
 	LogDebug bool   `mapstructure:"LOG_DEBUG"`
 }
