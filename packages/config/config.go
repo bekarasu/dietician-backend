@@ -9,7 +9,7 @@ type PostgresConfig struct {
 	Port     string `mapstructure:"POSTGRES_PORT"`
 	User     string `mapstructure:"POSTGRES_USER"`
 	Password string `mapstructure:"POSTGRES_PASSWORD"`
-	DBName   string `mapstructure:"AUTH_DB_NAME"`
+	DBName   string `mapstructure:"POSTGRES_DB_NAME"`
 	SSLMode  string `mapstructure:"POSTGRES_SSL_MODE"`
 }
 

@@ -21,7 +21,7 @@ Handles user authentication and authorization.
 
 - `AUTH_SERVICE_PORT` - Service port (default: 8081)
 - `JWT_SECRET` - Secret key for JWT signing
-- `AUTH_DB_NAME` - PostgreSQL database name
+- `POSTGRES_DB_NAME` - PostgreSQL database name
 - `POSTGRES_*` - PostgreSQL connection settings
 - `REDIS_*` - Redis connection settings
 
