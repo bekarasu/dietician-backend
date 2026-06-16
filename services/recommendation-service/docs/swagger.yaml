@@ -1,0 +1,14 @@
+basePath: /
+host: localhost:8081
+info:
+  contact: {}
+  description: This is the recommendation service for the dietician backend.
+  title: Recommendation Service API
+  version: "1.0"
+paths: {}
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

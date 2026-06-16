@@ -6,6 +6,6 @@ use (
 // ./services/gateway
 // ./services/medical-service
 // ./services/progress-service
-// ./services/recommendation-service
+	./services/recommendation-service
 // ./services/tracking-service
 )

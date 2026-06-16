@@ -1,0 +1,7 @@
+not_found = "Sayfa bulunamadı!"
+unexpected_error = "Beklenmeyen bir hata oluştu."
+validation_failed = "Verilen değerler geçersiz."
+unauthorized = "Kimlik doğrulama başarısız."
+body_parser_failed = "Verilen değerler ayrıştırılamadı."
+client_id_invalid = "Kullanıcı kimliği geçersiz."
+processing_error = "Sistemde geçici bir hata oluşmuştur. Lütfen daha sonra tekrar deneyiniz."
