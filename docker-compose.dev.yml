@@ -64,14 +64,3 @@ services:
     volumes:
       - ./services/medical-service:/app/services/medical-service
       - ./packages:/app/packages
-
-  tracking-service:
-    container_name: dietician-tracking-service
-    build:
-      context: ./services/tracking-service
-      dockerfile: deployments/dev/Dockerfile
-    ports:
-      - "8086:8086"
-    volumes:
-      - ./services/tracking-service:/app/services/tracking-service
-      - ./packages:/app/packages

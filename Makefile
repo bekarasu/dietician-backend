@@ -43,7 +43,6 @@ test:
 		dietician.local/services/progress-service/... \
 		dietician.local/services/recommendation-service/... \
 		dietician.local/services/medical-service/... \
-		dietician.local/services/tracking-service/...
 
 test-v:
 	@echo "=== Running all tests (verbose) ==="
@@ -54,4 +53,3 @@ test-v:
 		dietician.local/services/progress-service/... \
 		dietician.local/services/recommendation-service/... \
 		dietician.local/services/medical-service/... \
-		dietician.local/services/tracking-service/...

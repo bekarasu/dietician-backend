@@ -47,10 +47,3 @@ services:
     ports:
       - "8085:8085"
 
-  tracking-service:
-    container_name: dietician-tracking-service
-    build:
-      context: .
-      dockerfile: services/tracking-service/deployments/prod/Dockerfile
-    ports:
-      - "8086:8086"

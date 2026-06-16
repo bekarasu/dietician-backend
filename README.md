@@ -129,10 +129,9 @@ See [.env.example](.env.example) for all available configuration options.
 ├── gateway/              # API Gateway (CORS, rate limit, JWT, routing)
 ├── services/
 │   ├── account-service/     # Authentication (register, login, JWT) and User profiles and dietary preferences
-│   ├── progress-service/ # Weight logs and habit tracking
+│   ├── progress-service/ # Weight logs and habit(Meal, hydration, coffee) tracking
 │   ├── recommendation-service/  # AI recommendations with service clients
 │   ├── medical-service/  # Medical file upload metadata
-│   └── tracking-service/ # Meal, hydration, coffee tracking
 ├── packages/             # Shared Go packages
 │   ├── auth/             # Auth middleware helpers
 │   ├── config/           # Database and env config
