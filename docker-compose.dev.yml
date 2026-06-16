@@ -21,35 +21,13 @@ services:
       - ./services/account-service:/app/services/account-service
       - ./packages:/app/packages
 
-  profile-service:
-    container_name: dietician-profile-service
-    build:
-      context: ./services/profile-service
-      dockerfile: deployments/dev/Dockerfile
-    ports:
-      - "8082:8082"
-    volumes:
-      - ./services/profile-service:/app/services/profile-service
-      - ./packages:/app/packages
-
-  progress-service:
-    container_name: dietician-progress-service
-    build:
-      context: ./services/progress-service
-      dockerfile: deployments/dev/Dockerfile
-    ports:
-      - "8083:8083"
-    volumes:
-      - ./services/progress-service:/app/services/progress-service
-      - ./packages:/app/packages
-
   recommendation-service:
     container_name: dietician-recommendation-service
     build:
       context: ./services/recommendation-service
       dockerfile: deployments/dev/Dockerfile
     ports:
-      - "8084:8084"
+      - "8082:8082"
     volumes:
       - ./services/recommendation-service:/app/services/recommendation-service
       - ./packages:/app/packages
@@ -60,7 +38,18 @@ services:
       context: ./services/medical-service
       dockerfile: deployments/dev/Dockerfile
     ports:
-      - "8085:8085"
+      - "8083:8083"
     volumes:
       - ./services/medical-service:/app/services/medical-service
+      - ./packages:/app/packages
+
+  progress-service:
+    container_name: dietician-progress-service
+    build:
+      context: ./services/progress-service
+      dockerfile: deployments/dev/Dockerfile
+    ports:
+      - "8084:8084"
+    volumes:
+      - ./services/progress-service:/app/services/progress-service
       - ./packages:/app/packages

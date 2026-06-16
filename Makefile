@@ -39,7 +39,6 @@ test:
 	go test dietician.local/packages/... \
 		dietician.local/services/gateway/... \
 		dietician.local/services/account-service/... \
-		dietician.local/services/profile-service/... \
 		dietician.local/services/progress-service/... \
 		dietician.local/services/recommendation-service/... \
 		dietician.local/services/medical-service/... \
@@ -49,7 +48,6 @@ test-v:
 	go test -v dietician.local/packages/... \
 		dietician.local/services/gateway/... \
 		dietician.local/services/account-service/... \
-		dietician.local/services/profile-service/... \
 		dietician.local/services/progress-service/... \
 		dietician.local/services/recommendation-service/... \
 		dietician.local/services/medical-service/... \

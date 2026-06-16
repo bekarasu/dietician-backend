@@ -15,14 +15,6 @@ services:
     ports:
       - "8081:8081"
 
-  profile-service:
-    container_name: dietician-profile-service
-    build:
-      context: .
-      dockerfile: services/profile-service/deployments/prod/Dockerfile
-    ports:
-      - "8082:8082"
-
   progress-service:
     container_name: dietician-progress-service
     build:
@@ -46,4 +38,3 @@ services:
       dockerfile: services/medical-service/deployments/prod/Dockerfile
     ports:
       - "8085:8085"
-
