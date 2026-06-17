@@ -1,11 +1,229 @@
 basePath: /
+definitions:
+  repository.MedicalFileMetadata:
+    properties:
+      contentType:
+        type: string
+      fileName:
+        type: string
+      fileSize:
+        type: integer
+      id:
+        type: integer
+      storageKey:
+        type: string
+      uploadId:
+        type: integer
+    type: object
+  repository.MedicalUpload:
+    properties:
+      description:
+        type: string
+      id:
+        type: integer
+      status:
+        type: string
+      title:
+        type: string
+      uploadType:
+        type: string
+      userId:
+        type: string
+    type: object
+  response.ErrorResponse:
+    properties:
+      code:
+        type: integer
+      error:
+        type: string
+      message:
+        type: string
+      request_id:
+        type: string
+    type: object
+  response.SuccessResponse:
+    properties:
+      data: {}
+      message:
+        type: string
+    type: object
+  service.CreateUploadRequest:
+    properties:
+      description:
+        type: string
+      title:
+        type: string
+      uploadType:
+        type: string
+    type: object
+  service.UploadDetailResponse:
+    properties:
+      metadata:
+        items:
+          $ref: '#/definitions/repository.MedicalFileMetadata'
+        type: array
+      upload:
+        $ref: '#/definitions/repository.MedicalUpload'
+    type: object
 host: localhost:8085
 info:
   contact: {}
   description: This is the medical service for the dietician backend.
   title: Medical Service API
   version: "1.0"
-paths: {}
+paths:
+  /api/v1/medical/{userId}/uploads:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of medical uploads for a specific user
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.SuccessResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/repository.MedicalUpload'
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: List Medical Uploads
+      tags:
+      - Medical Uploads
+    post:
+      consumes:
+      - application/json
+      description: Create a new medical upload record for a user
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      - description: Create Upload Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/service.CreateUploadRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/repository.MedicalUpload'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create Medical Upload
+      tags:
+      - Medical Uploads
+  /api/v1/medical/{userId}/uploads/{uploadId}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a specific medical upload and its associated files
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      - description: Upload ID
+        in: path
+        name: uploadId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete Medical Upload
+      tags:
+      - Medical Uploads
+    get:
+      consumes:
+      - application/json
+      description: Retrieve the details of a specific medical upload, including file
+        metadata
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      - description: Upload ID
+        in: path
+        name: uploadId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/service.UploadDetailResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get Medical Upload Details
+      tags:
+      - Medical Uploads
 securityDefinitions:
   BearerAuth:
     in: header
