@@ -5,6 +5,6 @@ use (
 	./services/account-service
 	// ./services/gateway
 	./services/medical-service
-	// ./services/progress-service
+	./services/progress-service
 	./services/recommendation-service
 )

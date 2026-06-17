@@ -1,0 +1,128 @@
+package handler
+
+import (
+	"github.com/gofiber/fiber/v2"
+
+	"dietician.local/packages/response"
+	"dietician.local/services/progress-service/internal/progress/service"
+)
+
+type IProgressHandler interface {
+	GetProgress(c *fiber.Ctx) error
+	AddWeight(c *fiber.Ctx) error
+	GetWeeklySummary(c *fiber.Ctx) error
+	AddHabit(c *fiber.Ctx) error
+}
+
+type progressHandler struct {
+	progressService service.IProgressService
+}
+
+func NewProgressHandler(progressService service.IProgressService) IProgressHandler {
+	return &progressHandler{
+		progressService: progressService,
+	}
+}
+
+// GetProgress retrieves the progress history for a user.
+// @Summary Get Progress History
+// @Description Retrieve weight logs and habit logs for a specific user
+// @Tags Progress
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param userId path string true "User ID"
+// @Success 200 {object} response.SuccessResponse{data=service.ProgressResponse}
+// @Failure 400 {object} response.ErrorResponse
+// @Failure 500 {object} response.ErrorResponse
+// @Router /api/v1/progress/{userId} [get]
+func (h *progressHandler) GetProgress(c *fiber.Ctx) error {
+	userID := c.Params("userId")
+
+	progress, err := h.progressService.GetProgress(c.Context(), userID)
+	if err != nil {
+		return response.Error(c, fiber.StatusInternalServerError, "failed to get progress")
+	}
+
+	return response.Success(c, "progress retrieved successfully", progress)
+}
+
+// AddWeight creates a new weight log entry.
+// @Summary Add Weight Log
+// @Description Add a new weight log entry for a specific user
+// @Tags Progress
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param userId path string true "User ID"
+// @Param request body service.AddWeightRequest true "Add Weight Request"
+// @Success 200 {object} response.SuccessResponse{data=repository.WeightLog}
+// @Failure 400 {object} response.ErrorResponse
+// @Failure 500 {object} response.ErrorResponse
+// @Router /api/v1/progress/{userId}/weight [post]
+func (h *progressHandler) AddWeight(c *fiber.Ctx) error {
+	userID := c.Params("userId")
+	var req service.AddWeightRequest
+
+	if err := c.BodyParser(&req); err != nil {
+		return response.Error(c, fiber.StatusBadRequest, "invalid request body")
+	}
+
+	log, err := h.progressService.AddWeight(c.Context(), userID, req)
+	if err != nil {
+		return response.Error(c, fiber.StatusBadRequest, err.Error())
+	}
+
+	return response.Success(c, "weight log added successfully", log)
+}
+
+// GetWeeklySummary retrieves the weekly progress summary for a user.
+// @Summary Get Weekly Summary
+// @Description Retrieve the weekly progress summary including weight changes and habit completion
+// @Tags Progress
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param userId path string true "User ID"
+// @Success 200 {object} response.SuccessResponse{data=repository.WeeklyProgressSummary}
+// @Failure 500 {object} response.ErrorResponse
+// @Router /api/v1/progress/{userId}/weekly-summary [get]
+func (h *progressHandler) GetWeeklySummary(c *fiber.Ctx) error {
+	userID := c.Params("userId")
+
+	summary, err := h.progressService.GetWeeklySummary(c.Context(), userID)
+	if err != nil {
+		return response.Error(c, fiber.StatusInternalServerError, "failed to get weekly summary")
+	}
+
+	return response.Success(c, "weekly summary retrieved successfully", summary)
+}
+
+// AddHabit creates a new habit log entry.
+// @Summary Add Habit Log
+// @Description Add a new habit log entry for a specific user
+// @Tags Progress
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param userId path string true "User ID"
+// @Param request body service.AddHabitRequest true "Add Habit Request"
+// @Success 200 {object} response.SuccessResponse{data=repository.HabitLog}
+// @Failure 400 {object} response.ErrorResponse
+// @Failure 500 {object} response.ErrorResponse
+// @Router /api/v1/progress/{userId}/habits [post]
+func (h *progressHandler) AddHabit(c *fiber.Ctx) error {
+	userID := c.Params("userId")
+	var req service.AddHabitRequest
+
+	if err := c.BodyParser(&req); err != nil {
+		return response.Error(c, fiber.StatusBadRequest, "invalid request body")
+	}
+
+	log, err := h.progressService.AddHabit(c.Context(), userID, req)
+	if err != nil {
+		return response.Error(c, fiber.StatusBadRequest, err.Error())
+	}
+
+	return response.Success(c, "habit log added successfully", log)
+}

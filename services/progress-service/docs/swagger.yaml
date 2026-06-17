@@ -1,0 +1,269 @@
+basePath: /
+definitions:
+  repository.HabitLog:
+    properties:
+      completed:
+        type: boolean
+      createdAt:
+        type: string
+      habitName:
+        type: string
+      id:
+        type: string
+      loggedAt:
+        type: string
+      notes:
+        type: string
+      userId:
+        type: string
+    type: object
+  repository.WeeklyProgressSummary:
+    properties:
+      createdAt:
+        type: string
+      endWeight:
+        type: number
+      habitsCompleted:
+        type: integer
+      habitsTotal:
+        type: integer
+      id:
+        type: string
+      startWeight:
+        type: number
+      summary:
+        type: string
+      userId:
+        type: string
+      weekEnd:
+        type: string
+      weekStart:
+        type: string
+      weightChange:
+        type: number
+    type: object
+  repository.WeightLog:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: string
+      loggedAt:
+        type: string
+      notes:
+        type: string
+      userId:
+        type: string
+      weightKg:
+        type: number
+    type: object
+  response.ErrorResponse:
+    properties:
+      code:
+        type: integer
+      error:
+        type: string
+      message:
+        type: string
+      request_id:
+        type: string
+    type: object
+  response.SuccessResponse:
+    properties:
+      data: {}
+      message:
+        type: string
+    type: object
+  service.AddHabitRequest:
+    properties:
+      completed:
+        type: boolean
+      habitName:
+        type: string
+      notes:
+        type: string
+    type: object
+  service.AddWeightRequest:
+    properties:
+      notes:
+        type: string
+      weightKg:
+        type: number
+    type: object
+  service.ProgressResponse:
+    properties:
+      habitLogs:
+        items:
+          $ref: '#/definitions/repository.HabitLog'
+        type: array
+      weightLogs:
+        items:
+          $ref: '#/definitions/repository.WeightLog'
+        type: array
+    type: object
+host: localhost:8083
+info:
+  contact: {}
+  description: This is the progress service for the dietician backend.
+  title: Progress Service API
+  version: "1.0"
+paths:
+  /api/v1/progress/{userId}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve weight logs and habit logs for a specific user
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/service.ProgressResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get Progress History
+      tags:
+      - Progress
+  /api/v1/progress/{userId}/habits:
+    post:
+      consumes:
+      - application/json
+      description: Add a new habit log entry for a specific user
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      - description: Add Habit Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/service.AddHabitRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/repository.HabitLog'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Add Habit Log
+      tags:
+      - Progress
+  /api/v1/progress/{userId}/weekly-summary:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve the weekly progress summary including weight changes and
+        habit completion
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/repository.WeeklyProgressSummary'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get Weekly Summary
+      tags:
+      - Progress
+  /api/v1/progress/{userId}/weight:
+    post:
+      consumes:
+      - application/json
+      description: Add a new weight log entry for a specific user
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      - description: Add Weight Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/service.AddWeightRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/repository.WeightLog'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Add Weight Log
+      tags:
+      - Progress
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
