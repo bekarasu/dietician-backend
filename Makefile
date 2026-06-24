@@ -72,6 +72,14 @@ swag:
 		fi \
 	done
 
+wire:
+	@for d in services/*; do \
+		if [ -f "$$d/Makefile" ]; then \
+			echo "=== Running make wire for $$d ==="; \
+			$(MAKE) -C "$$d" wire || true; \
+		fi \
+	done
+
 tidy:
 	@for d in services/*; do \
 		if [ -f "$$d/go.mod" ]; then \
