@@ -21,14 +21,29 @@ type BasicAuthentication struct {
 	Password string
 }
 
-type ITokenizer interface {
-	GenerateJWT(claims jwt.MapClaims) (string, error)
+// ITokenVerifier provides read-only JWT operations: verify, extract claims,
+// check Redis session, and basic auth. Used by services that only need to
+// validate incoming tokens (e.g. medical-service, progress-service).
+type ITokenVerifier interface {
 	VerifyJWT(token string) (*jwt.Token, error)
 	ExtractClaims(j *jwt.Token) (jwt.MapClaims, error)
-	StoreJWTInRedis(ctx context.Context, token string, expiration time.Duration) error
 	IsJWTInRedis(ctx context.Context, token string) (bool, error)
-	RemoveJWTFromRedis(ctx context.Context, token string) error
 	IsBasicAuthorized(token string, username, password string) bool
+}
+
+// ITokenWriter provides write JWT operations: generate tokens and manage
+// Redis sessions. Used only by account-service.
+type ITokenWriter interface {
+	GenerateJWT(claims jwt.MapClaims) (string, error)
+	StoreJWTInRedis(ctx context.Context, token string, expiration time.Duration) error
+	RemoveJWTFromRedis(ctx context.Context, token string) error
+}
+
+// ITokenizer combines both read and write JWT operations.
+// Used by account-service which needs full access.
+type ITokenizer interface {
+	ITokenVerifier
+	ITokenWriter
 }
 
 type tokenizer struct {
@@ -36,7 +51,18 @@ type tokenizer struct {
 	redis  *redis.Client
 }
 
+// NewTokenizer creates a full-access tokenizer (read + write).
+// Use this in account-service.
 func NewTokenizer(c Config, r *redis.Client) ITokenizer {
+	return &tokenizer{
+		config: c,
+		redis:  r,
+	}
+}
+
+// NewTokenVerifier creates a read-only tokenizer (verify + extract only).
+// Use this in services that only need to validate incoming JWTs.
+func NewTokenVerifier(c Config, r *redis.Client) ITokenVerifier {
 	return &tokenizer{
 		config: c,
 		redis:  r,

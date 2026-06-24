@@ -8,7 +8,7 @@ import (
 )
 
 // TokenizerContextMiddleware injects the Tokenizer into the request context.
-func TokenizerContextMiddleware(tok tokenizer.ITokenizer) fiber.Handler {
+func TokenizerContextMiddleware(tok tokenizer.ITokenVerifier) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		c.Locals(constants.TokenizerKey, tok)
 		return c.Next()

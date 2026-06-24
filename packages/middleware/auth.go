@@ -31,7 +31,7 @@ func ExtractBearerToken(c *fiber.Ctx) string {
 }
 
 func UserAuthMiddleware(c *fiber.Ctx) error {
-	tok, ok := c.Locals(constants.TokenizerKey).(tokenizer.ITokenizer)
+	tok, ok := c.Locals(constants.TokenizerKey).(tokenizer.ITokenVerifier)
 	if !ok || tok == nil {
 		return response.Error(c, fiber.StatusInternalServerError, "tokenizer not configured")
 	}
