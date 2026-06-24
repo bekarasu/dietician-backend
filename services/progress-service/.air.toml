@@ -9,6 +9,7 @@ exclude_dir = ["tmp", "migrations"]
 delay = 1000
 kill_delay = 500
 rerun = false
+poll = true
 
 [log]
 time = true
