@@ -5,10 +5,11 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 
+	"dietician.local/packages/middleware"
 	"dietician.local/packages/response"
-	"dietician.local/services/medical-service/internal/medical/dto/request"
-	_ "dietician.local/services/medical-service/internal/medical/dto/response"
-	"dietician.local/services/medical-service/internal/medical/service"
+	"dietician.local/services/medical-service/internal/uploads/dto/request"
+	_ "dietician.local/services/medical-service/internal/uploads/dto/response"
+	"dietician.local/services/medical-service/internal/uploads/service"
 )
 
 type IMedicalHandler interface {
@@ -32,19 +33,27 @@ func NewMedicalHandler(medService service.IMedicalService) IMedicalHandler {
 // @Summary Create Medical Upload
 // @Description Create a new medical upload record for a user
 // @Tags Medical Uploads
-// @Accept json
+// @Accept multipart/form-data
 // @Produce json
 // @Security BearerAuth
-// @Param userId path string true "User ID"
-// @Param request body requestdto.CreateUploadRequest true "Create Upload Request"
+// @Param uploadType formData string true "Upload Type"
+// @Param title formData string true "Title"
+// @Param description formData string false "Description"
+// @Param file formData file true "File to upload"
 // @Success 200 {object} response.SuccessResponse{data=repository.MedicalUpload}
 // @Failure 400 {object} response.ErrorResponse
 // @Failure 500 {object} response.ErrorResponse
-// @Router /api/v1/medical/{userId}/uploads [post]
+// @Router /api/v1/uploads [post]
 func (h *medicalHandler) CreateUpload(c *fiber.Ctx) error {
-	userID := c.Params("userId")
-	var req request.CreateUploadRequest
+	userID := middleware.GetUserID(c.UserContext())
 
+	file, err := c.FormFile("file")
+	if err != nil {
+		return response.Error(c, fiber.StatusBadRequest, "file is required")
+	}
+	_ = file // TODO: Pass file to service when ready
+
+	var req request.CreateUploadRequest
 	if err := c.BodyParser(&req); err != nil {
 		return response.Error(c, fiber.StatusBadRequest, "invalid request body")
 	}
@@ -64,12 +73,11 @@ func (h *medicalHandler) CreateUpload(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Security BearerAuth
-// @Param userId path string true "User ID"
 // @Success 200 {object} response.SuccessResponse{data=[]repository.MedicalUpload}
 // @Failure 500 {object} response.ErrorResponse
-// @Router /api/v1/medical/{userId}/uploads [get]
+// @Router /api/v1/uploads [get]
 func (h *medicalHandler) ListUploads(c *fiber.Ctx) error {
-	userID := c.Params("userId")
+	userID := middleware.GetUserID(c.UserContext())
 
 	res, err := h.medService.ListUploads(c.Context(), userID)
 	if err != nil {
@@ -86,14 +94,13 @@ func (h *medicalHandler) ListUploads(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Security BearerAuth
-// @Param userId path string true "User ID"
 // @Param uploadId path int true "Upload ID"
 // @Success 200 {object} response.SuccessResponse{data=response.UploadDetailResponse}
 // @Failure 400 {object} response.ErrorResponse
 // @Failure 500 {object} response.ErrorResponse
-// @Router /api/v1/medical/{userId}/uploads/{uploadId} [get]
+// @Router /api/v1/uploads/{uploadId} [get]
 func (h *medicalHandler) GetUploadDetail(c *fiber.Ctx) error {
-	userID := c.Params("userId")
+	userID := middleware.GetUserID(c.UserContext())
 	uploadID, err := strconv.ParseInt(c.Params("uploadId"), 10, 64)
 	if err != nil {
 		return response.Error(c, fiber.StatusBadRequest, "invalid upload id")
@@ -114,14 +121,13 @@ func (h *medicalHandler) GetUploadDetail(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Security BearerAuth
-// @Param userId path string true "User ID"
 // @Param uploadId path int true "Upload ID"
 // @Success 200 {object} response.SuccessResponse
 // @Failure 400 {object} response.ErrorResponse
 // @Failure 500 {object} response.ErrorResponse
-// @Router /api/v1/medical/{userId}/uploads/{uploadId} [delete]
+// @Router /api/v1/uploads/{uploadId} [delete]
 func (h *medicalHandler) DeleteUpload(c *fiber.Ctx) error {
-	userID := c.Params("userId")
+	userID := middleware.GetUserID(c.UserContext())
 	uploadID, err := strconv.ParseInt(c.Params("uploadId"), 10, 64)
 	if err != nil {
 		return response.Error(c, fiber.StatusBadRequest, "invalid upload id")

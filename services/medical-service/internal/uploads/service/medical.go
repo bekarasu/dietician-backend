@@ -3,10 +3,11 @@ package service
 import (
 	"context"
 
-	"dietician.local/services/medical-service/internal/medical/dto/request"
-	"dietician.local/services/medical-service/internal/medical/dto/response"
-	"dietician.local/services/medical-service/internal/medical/repository"
 	"dietician.local/services/medical-service/internal/storage"
+	"dietician.local/services/medical-service/internal/uploads/dto/request"
+	"dietician.local/services/medical-service/internal/uploads/dto/response"
+	"dietician.local/services/medical-service/internal/uploads/repository"
+	"github.com/sirupsen/logrus"
 )
 
 type IMedicalService interface {
@@ -19,12 +20,14 @@ type IMedicalService interface {
 type medicalService struct {
 	repo     repository.IMedicalRepository
 	provider storage.Provider
+	logger   *logrus.Logger
 }
 
-func NewMedicalService(repo repository.IMedicalRepository, provider storage.Provider) IMedicalService {
+func NewMedicalService(repo repository.IMedicalRepository, provider storage.Provider, l *logrus.Logger) IMedicalService {
 	return &medicalService{
 		repo:     repo,
 		provider: provider,
+		logger:   l,
 	}
 }
 
@@ -37,8 +40,11 @@ func (s *medicalService) CreateUpload(ctx context.Context, userID string, req re
 		Status:      "pending",
 	}
 
+	s.logger.Info(upload)
+
 	err := s.repo.CreateUpload(ctx, upload)
 	if err != nil {
+		s.logger.Error("Failed to create upload", err)
 		return nil, err
 	}
 

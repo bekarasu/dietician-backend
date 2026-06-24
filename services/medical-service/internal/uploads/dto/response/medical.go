@@ -1,6 +1,6 @@
 package response
 
-import "dietician.local/services/medical-service/internal/medical/repository"
+import "dietician.local/services/medical-service/internal/uploads/repository"
 
 type UploadDetailResponse struct {
 	Upload   repository.MedicalUpload         `json:"upload"`

@@ -3,7 +3,8 @@ package internal
 import (
 	"github.com/gofiber/fiber/v2"
 
-	"dietician.local/services/medical-service/internal/medical/handler"
+	"dietician.local/packages/middleware"
+	"dietician.local/services/medical-service/internal/uploads/handler"
 )
 
 type RouteContext struct {
@@ -29,8 +30,8 @@ func (r *route) SetupRoutes(rc *RouteContext) {
 }
 
 func (r *route) medicalRoutes(app *fiber.App) {
-	medicalGroup := app.Group("/api/v1/medical/:userId/uploads")
-	
+	medicalGroup := app.Group("/api/v1/uploads", middleware.UserAuthMiddleware)
+
 	medicalGroup.Post("/", r.medicalHandler.CreateUpload)
 	medicalGroup.Get("/", r.medicalHandler.ListUploads)
 	medicalGroup.Get("/:uploadId", r.medicalHandler.GetUploadDetail)
