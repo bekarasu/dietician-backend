@@ -4,7 +4,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	"dietician.local/packages/middleware"
-	"dietician.local/services/account-service/internal/handler"
+	authhandler "dietician.local/services/account-service/internal/auth/handler"
+	profilehandler "dietician.local/services/account-service/internal/profile/handler"
 )
 
 // RouteContext holds the dependencies passed into SetupRoutes.
@@ -18,12 +19,12 @@ type IRoute interface {
 }
 
 type route struct {
-	authHandler    handler.IAuthHandler
-	profileHandler handler.IProfileHandler
+	authHandler    authhandler.IAuthHandler
+	profileHandler profilehandler.IProfileHandler
 }
 
 // NewRoute wires all handlers into the route implementation.
-func NewRoute(authHandler handler.IAuthHandler, profileHandler handler.IProfileHandler) IRoute {
+func NewRoute(authHandler authhandler.IAuthHandler, profileHandler profilehandler.IProfileHandler) IRoute {
 	return &route{
 		authHandler:    authHandler,
 		profileHandler: profileHandler,

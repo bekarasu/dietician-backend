@@ -8,8 +8,8 @@ import (
 	"dietician.local/packages/validation"
 	"dietician.local/services/account-service/internal/auth/model"
 	"dietician.local/services/account-service/internal/auth/service"
-	"dietician.local/services/account-service/internal/dto/request"
-	"dietician.local/services/account-service/internal/dto/response"
+	"dietician.local/services/account-service/internal/auth/dto/request"
+	"dietician.local/services/account-service/internal/auth/dto/response"
 )
 
 type IAuthHandler interface {

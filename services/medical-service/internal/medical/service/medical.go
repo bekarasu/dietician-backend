@@ -3,26 +3,17 @@ package service
 import (
 	"context"
 
+	"dietician.local/services/medical-service/internal/medical/dto/request"
+	"dietician.local/services/medical-service/internal/medical/dto/response"
 	"dietician.local/services/medical-service/internal/medical/repository"
 	"dietician.local/services/medical-service/internal/storage"
 )
 
 type IMedicalService interface {
-	CreateUpload(ctx context.Context, userID string, req CreateUploadRequest) (*repository.MedicalUpload, error)
+	CreateUpload(ctx context.Context, userID string, req request.CreateUploadRequest) (*repository.MedicalUpload, error)
 	ListUploads(ctx context.Context, userID string) ([]repository.MedicalUpload, error)
-	GetUploadDetail(ctx context.Context, userID string, uploadID int64) (*UploadDetailResponse, error)
+	GetUploadDetail(ctx context.Context, userID string, uploadID int64) (*response.UploadDetailResponse, error)
 	DeleteUpload(ctx context.Context, userID string, uploadID int64) error
-}
-
-type CreateUploadRequest struct {
-	UploadType  string `json:"uploadType"`
-	Title       string `json:"title"`
-	Description string `json:"description"`
-}
-
-type UploadDetailResponse struct {
-	Upload   repository.MedicalUpload         `json:"upload"`
-	Metadata []repository.MedicalFileMetadata `json:"metadata"`
 }
 
 type medicalService struct {
@@ -37,7 +28,7 @@ func NewMedicalService(repo repository.IMedicalRepository, provider storage.Prov
 	}
 }
 
-func (s *medicalService) CreateUpload(ctx context.Context, userID string, req CreateUploadRequest) (*repository.MedicalUpload, error) {
+func (s *medicalService) CreateUpload(ctx context.Context, userID string, req request.CreateUploadRequest) (*repository.MedicalUpload, error) {
 	upload := &repository.MedicalUpload{
 		UserID:      userID,
 		UploadType:  req.UploadType,
@@ -58,7 +49,7 @@ func (s *medicalService) ListUploads(ctx context.Context, userID string) ([]repo
 	return s.repo.GetUploadsByUserID(ctx, userID)
 }
 
-func (s *medicalService) GetUploadDetail(ctx context.Context, userID string, uploadID int64) (*UploadDetailResponse, error) {
+func (s *medicalService) GetUploadDetail(ctx context.Context, userID string, uploadID int64) (*response.UploadDetailResponse, error) {
 	upload, err := s.repo.GetUploadByID(ctx, uploadID)
 	if err != nil {
 		return nil, err
@@ -69,7 +60,7 @@ func (s *medicalService) GetUploadDetail(ctx context.Context, userID string, upl
 		return nil, err
 	}
 
-	return &UploadDetailResponse{
+	return &response.UploadDetailResponse{
 		Upload:   *upload,
 		Metadata: metadata,
 	}, nil

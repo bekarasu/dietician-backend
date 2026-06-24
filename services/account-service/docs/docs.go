@@ -562,7 +562,6 @@ const docTemplate = `{
             "required": [
                 "email",
                 "first_name",
-                "last_name",
                 "password"
             ],
             "properties": {
@@ -570,9 +569,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "first_name": {
-                    "type": "string"
-                },
-                "last_name": {
                     "type": "string"
                 },
                 "password": {

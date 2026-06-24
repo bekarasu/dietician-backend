@@ -54,7 +54,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/service.ProgressResponse"
+                                            "$ref": "#/definitions/response.ProgressResponse"
                                         }
                                     }
                                 }
@@ -108,7 +108,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/service.AddHabitRequest"
+                            "$ref": "#/definitions/request.AddHabitRequest"
                         }
                     }
                 ],
@@ -233,7 +233,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/service.AddWeightRequest"
+                            "$ref": "#/definitions/request.AddWeightRequest"
                         }
                     }
                 ],
@@ -360,6 +360,31 @@ const docTemplate = `{
                 }
             }
         },
+        "request.AddHabitRequest": {
+            "type": "object",
+            "properties": {
+                "completed": {
+                    "type": "boolean"
+                },
+                "habitName": {
+                    "type": "string"
+                },
+                "notes": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.AddWeightRequest": {
+            "type": "object",
+            "properties": {
+                "notes": {
+                    "type": "string"
+                },
+                "weightKg": {
+                    "type": "number"
+                }
+            }
+        },
         "response.ErrorResponse": {
             "type": "object",
             "properties": {
@@ -377,41 +402,7 @@ const docTemplate = `{
                 }
             }
         },
-        "response.SuccessResponse": {
-            "type": "object",
-            "properties": {
-                "data": {},
-                "message": {
-                    "type": "string"
-                }
-            }
-        },
-        "service.AddHabitRequest": {
-            "type": "object",
-            "properties": {
-                "completed": {
-                    "type": "boolean"
-                },
-                "habitName": {
-                    "type": "string"
-                },
-                "notes": {
-                    "type": "string"
-                }
-            }
-        },
-        "service.AddWeightRequest": {
-            "type": "object",
-            "properties": {
-                "notes": {
-                    "type": "string"
-                },
-                "weightKg": {
-                    "type": "number"
-                }
-            }
-        },
-        "service.ProgressResponse": {
+        "response.ProgressResponse": {
             "type": "object",
             "properties": {
                 "habitLogs": {
@@ -425,6 +416,15 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/repository.WeightLog"
                     }
+                }
+            }
+        },
+        "response.SuccessResponse": {
+            "type": "object",
+            "properties": {
+                "data": {},
+                "message": {
+                    "type": "string"
                 }
             }
         }

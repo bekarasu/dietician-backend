@@ -3,7 +3,7 @@ package model
 import (
 	"time"
 
-	"dietician.local/services/account-service/internal/dto/response"
+	"dietician.local/services/account-service/internal/profile/dto/response"
 )
 
 type UserProfile struct {

@@ -97,7 +97,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/service.CreateUploadRequest"
+                            "$ref": "#/definitions/request.CreateUploadRequest"
                         }
                     }
                 ],
@@ -181,7 +181,7 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/service.UploadDetailResponse"
+                                            "$ref": "#/definitions/response.UploadDetailResponse"
                                         }
                                     }
                                 }
@@ -305,6 +305,20 @@
                 }
             }
         },
+        "request.CreateUploadRequest": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "uploadType": {
+                    "type": "string"
+                }
+            }
+        },
         "response.ErrorResponse": {
             "type": "object",
             "properties": {
@@ -331,21 +345,7 @@
                 }
             }
         },
-        "service.CreateUploadRequest": {
-            "type": "object",
-            "properties": {
-                "description": {
-                    "type": "string"
-                },
-                "title": {
-                    "type": "string"
-                },
-                "uploadType": {
-                    "type": "string"
-                }
-            }
-        },
-        "service.UploadDetailResponse": {
+        "response.UploadDetailResponse": {
             "type": "object",
             "properties": {
                 "metadata": {

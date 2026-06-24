@@ -6,6 +6,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	"dietician.local/packages/response"
+	requestdto "dietician.local/services/medical-service/internal/medical/dto/request"
+	_ "dietician.local/services/medical-service/internal/medical/dto/response"
 	"dietician.local/services/medical-service/internal/medical/service"
 )
 
@@ -34,14 +36,14 @@ func NewMedicalHandler(medService service.IMedicalService) IMedicalHandler {
 // @Produce json
 // @Security BearerAuth
 // @Param userId path string true "User ID"
-// @Param request body service.CreateUploadRequest true "Create Upload Request"
+// @Param request body requestdto.CreateUploadRequest true "Create Upload Request"
 // @Success 200 {object} response.SuccessResponse{data=repository.MedicalUpload}
 // @Failure 400 {object} response.ErrorResponse
 // @Failure 500 {object} response.ErrorResponse
 // @Router /api/v1/medical/{userId}/uploads [post]
 func (h *medicalHandler) CreateUpload(c *fiber.Ctx) error {
 	userID := c.Params("userId")
-	var req service.CreateUploadRequest
+	var req requestdto.CreateUploadRequest
 
 	if err := c.BodyParser(&req); err != nil {
 		return response.Error(c, fiber.StatusBadRequest, "invalid request body")
@@ -86,7 +88,7 @@ func (h *medicalHandler) ListUploads(c *fiber.Ctx) error {
 // @Security BearerAuth
 // @Param userId path string true "User ID"
 // @Param uploadId path int true "Upload ID"
-// @Success 200 {object} response.SuccessResponse{data=service.UploadDetailResponse}
+// @Success 200 {object} response.SuccessResponse{data=response.UploadDetailResponse}
 // @Failure 400 {object} response.ErrorResponse
 // @Failure 500 {object} response.ErrorResponse
 // @Router /api/v1/medical/{userId}/uploads/{uploadId} [get]

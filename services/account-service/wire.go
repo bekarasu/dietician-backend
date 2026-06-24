@@ -13,7 +13,8 @@ import (
 	"dietician.local/services/account-service/internal"
 	authrepository "dietician.local/services/account-service/internal/auth/repository"
 	authservice "dietician.local/services/account-service/internal/auth/service"
-	"dietician.local/services/account-service/internal/handler"
+	authhandler "dietician.local/services/account-service/internal/auth/handler"
+	profilehandler "dietician.local/services/account-service/internal/profile/handler"
 	profilerepository "dietician.local/services/account-service/internal/profile/repository"
 	profileservice "dietician.local/services/account-service/internal/profile/service"
 )
@@ -26,14 +27,14 @@ var authSet = wire.NewSet(
 	authservice.NewOTPService,
 	authservice.NewRefreshTokenService,
 	authservice.NewUserService,
-	handler.NewAuthHandler,
+	authhandler.NewAuthHandler,
 )
 
 // profileSet wires profile dependencies
 var profileSet = wire.NewSet(
 	profilerepository.NewProfileRepository,
 	profileservice.NewProfileService,
-	handler.NewProfileHandler,
+	profilehandler.NewProfileHandler,
 )
 
 // InitializeRoute creates the main Route instance with all dependencies wired.

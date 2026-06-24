@@ -1,3 +1,7 @@
 [account_not_found]
 hash = "sha1-df3c9a430b01da56fb39d38f3ba7fe2dfcc4a3d9"
-other = "Account Not Found"
+other = "Hesap bulunamadı"
+
+[email_already_registered]
+hash = "sha1-df3c9a430b01da56fb39d38f3ba7fe2dfcc4a3d1"
+other = "Email zaten kayıtlı"

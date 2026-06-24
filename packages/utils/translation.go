@@ -2,6 +2,7 @@ package utils
 
 import (
 	"context"
+	"fmt"
 
 	"dietician.local/packages/localizer"
 	"dietician.local/packages/middleware"
@@ -17,9 +18,11 @@ var (
 func TranslateByIDWithContext(ctx context.Context, msgID string) string {
 	l := middleware.GetLocalizerFromContext(ctx)
 	if l != nil {
+		fmt.Println(msgID)
 		msg, _ := l.LocalizeMessage(&i18n.Message{
 			ID: msgID,
 		})
+		fmt.Println(msg)
 		return msg
 	}
 	return ""

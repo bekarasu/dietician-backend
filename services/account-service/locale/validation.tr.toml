@@ -5,3 +5,6 @@ min = "{{.Field}} en az {{.Param}} karakter olmalıdır"
 len = "{{.Field}} tam olarak {{.Param}} karakter olmalıdır"
 gt = "{{.Field}}, {{.Param}} değerinden büyük olmalıdır"
 datetime = "{{.Field}} geçerli bir tarih/saat formatında olmalıdır"
+
+[field]
+lastName = "Soyad"

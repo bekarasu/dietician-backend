@@ -6,7 +6,7 @@ import (
 	"dietician.local/packages/middleware"
 	pkgresponse "dietician.local/packages/response"
 	"dietician.local/packages/validation"
-	"dietician.local/services/account-service/internal/dto/request"
+	"dietician.local/services/account-service/internal/profile/dto/request"
 	profileservice "dietician.local/services/account-service/internal/profile/service"
 )
 

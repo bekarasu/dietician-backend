@@ -30,12 +30,12 @@ func LocalizerMiddleware() fiber.Handler {
 		var l *i18n.Localizer
 		var selectedLang string
 
-		if lang == localizer.EnglishLanguage || lang == "en" {
-			l = localizer.GetEnglishLocalizer()
-			selectedLang = localizer.EnglishLanguage
-		} else {
+		if lang == localizer.TurkishLanguage || lang == "tr" {
 			l = localizer.GetTurkishLocalizer()
 			selectedLang = localizer.TurkishLanguage
+		} else {
+			l = localizer.GetEnglishLocalizer()
+			selectedLang = localizer.EnglishLanguage
 		}
 
 		ctx := context.WithValue(c.UserContext(), LocalizerKey, l)

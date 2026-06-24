@@ -10,9 +10,10 @@ import (
 	"dietician.local/packages/tokenizer"
 	"dietician.local/services/account-service/config"
 	"dietician.local/services/account-service/internal"
+	"dietician.local/services/account-service/internal/auth/handler"
 	"dietician.local/services/account-service/internal/auth/repository"
 	"dietician.local/services/account-service/internal/auth/service"
-	"dietician.local/services/account-service/internal/handler"
+	handler2 "dietician.local/services/account-service/internal/profile/handler"
 	repository2 "dietician.local/services/account-service/internal/profile/repository"
 	service2 "dietician.local/services/account-service/internal/profile/service"
 	"github.com/google/wire"
@@ -33,7 +34,7 @@ func InitRoute(db *sqlx.DB, cfg *config.AccountAppScheme, sender service.EmailSe
 	iAuthHandler := handler.NewAuthHandler(iUserService)
 	profileRepository := repository2.NewProfileRepository(db)
 	profileService := service2.NewProfileService(profileRepository)
-	iProfileHandler := handler.NewProfileHandler(profileService)
+	iProfileHandler := handler2.NewProfileHandler(profileService)
 	iRoute := internal.NewRoute(iAuthHandler, iProfileHandler)
 	return iRoute
 }
@@ -44,4 +45,4 @@ func InitRoute(db *sqlx.DB, cfg *config.AccountAppScheme, sender service.EmailSe
 var authSet = wire.NewSet(repository.NewUserRepository, repository.NewRefreshTokenRepository, repository.NewOTPRepository, service.NewOTPService, service.NewRefreshTokenService, service.NewUserService, handler.NewAuthHandler)
 
 // profileSet wires profile dependencies
-var profileSet = wire.NewSet(repository2.NewProfileRepository, service2.NewProfileService, handler.NewProfileHandler)
+var profileSet = wire.NewSet(repository2.NewProfileRepository, service2.NewProfileService, handler2.NewProfileHandler)

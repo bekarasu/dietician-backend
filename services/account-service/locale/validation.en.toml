@@ -5,3 +5,6 @@ min = "{{.Field}} must be at least {{.Param}} characters"
 len = "{{.Field}} must be exactly {{.Param}} characters"
 gt = "{{.Field}} must be greater than {{.Param}}"
 datetime = "{{.Field}} must be a valid date/time format"
+
+[field]
+lastName = "Soyad"

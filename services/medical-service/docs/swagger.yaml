@@ -30,6 +30,15 @@ definitions:
       userId:
         type: string
     type: object
+  request.CreateUploadRequest:
+    properties:
+      description:
+        type: string
+      title:
+        type: string
+      uploadType:
+        type: string
+    type: object
   response.ErrorResponse:
     properties:
       code:
@@ -47,16 +56,7 @@ definitions:
       message:
         type: string
     type: object
-  service.CreateUploadRequest:
-    properties:
-      description:
-        type: string
-      title:
-        type: string
-      uploadType:
-        type: string
-    type: object
-  service.UploadDetailResponse:
+  response.UploadDetailResponse:
     properties:
       metadata:
         items:
@@ -121,7 +121,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/service.CreateUploadRequest'
+          $ref: '#/definitions/request.CreateUploadRequest'
       produces:
       - application/json
       responses:
@@ -209,7 +209,7 @@ paths:
             - $ref: '#/definitions/response.SuccessResponse'
             - properties:
                 data:
-                  $ref: '#/definitions/service.UploadDetailResponse'
+                  $ref: '#/definitions/response.UploadDetailResponse'
               type: object
         "400":
           description: Bad Request

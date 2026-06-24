@@ -4,30 +4,16 @@ import (
 	"context"
 	"errors"
 
+	"dietician.local/services/progress-service/internal/progress/dto/request"
+	"dietician.local/services/progress-service/internal/progress/dto/response"
 	"dietician.local/services/progress-service/internal/progress/repository"
 )
 
 type IProgressService interface {
-	GetProgress(ctx context.Context, userID string) (*ProgressResponse, error)
-	AddWeight(ctx context.Context, userID string, req AddWeightRequest) (*repository.WeightLog, error)
+	GetProgress(ctx context.Context, userID string) (*response.ProgressResponse, error)
+	AddWeight(ctx context.Context, userID string, req request.AddWeightRequest) (*repository.WeightLog, error)
 	GetWeeklySummary(ctx context.Context, userID string) (*repository.WeeklyProgressSummary, error)
-	AddHabit(ctx context.Context, userID string, req AddHabitRequest) (*repository.HabitLog, error)
-}
-
-type AddWeightRequest struct {
-	WeightKg float64 `json:"weightKg"`
-	Notes    *string `json:"notes,omitempty"`
-}
-
-type AddHabitRequest struct {
-	HabitName string  `json:"habitName"`
-	Completed bool    `json:"completed"`
-	Notes     *string `json:"notes,omitempty"`
-}
-
-type ProgressResponse struct {
-	WeightLogs []repository.WeightLog `json:"weightLogs"`
-	HabitLogs  []repository.HabitLog  `json:"habitLogs"`
+	AddHabit(ctx context.Context, userID string, req request.AddHabitRequest) (*repository.HabitLog, error)
 }
 
 type progressService struct {
@@ -38,7 +24,7 @@ func NewProgressService(repo repository.IProgressRepository) IProgressService {
 	return &progressService{repo: repo}
 }
 
-func (s *progressService) GetProgress(ctx context.Context, userID string) (*ProgressResponse, error) {
+func (s *progressService) GetProgress(ctx context.Context, userID string) (*response.ProgressResponse, error) {
 	weights, err := s.repo.GetWeightLogs(ctx, userID)
 	if err != nil {
 		return nil, err
@@ -55,13 +41,13 @@ func (s *progressService) GetProgress(ctx context.Context, userID string) (*Prog
 		habits = []repository.HabitLog{}
 	}
 
-	return &ProgressResponse{
+	return &response.ProgressResponse{
 		WeightLogs: weights,
 		HabitLogs:  habits,
 	}, nil
 }
 
-func (s *progressService) AddWeight(ctx context.Context, userID string, req AddWeightRequest) (*repository.WeightLog, error) {
+func (s *progressService) AddWeight(ctx context.Context, userID string, req request.AddWeightRequest) (*repository.WeightLog, error) {
 	if req.WeightKg <= 0 {
 		return nil, errors.New("weight must be positive")
 	}
@@ -81,7 +67,7 @@ func (s *progressService) GetWeeklySummary(ctx context.Context, userID string) (
 	return s.repo.GetWeeklySummary(ctx, userID)
 }
 
-func (s *progressService) AddHabit(ctx context.Context, userID string, req AddHabitRequest) (*repository.HabitLog, error) {
+func (s *progressService) AddHabit(ctx context.Context, userID string, req request.AddHabitRequest) (*repository.HabitLog, error) {
 	if req.HabitName == "" {
 		return nil, errors.New("habit name is required")
 	}

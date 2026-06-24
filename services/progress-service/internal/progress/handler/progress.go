@@ -4,6 +4,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	"dietician.local/packages/response"
+	requestdto "dietician.local/services/progress-service/internal/progress/dto/request"
+	_ "dietician.local/services/progress-service/internal/progress/dto/response"
 	"dietician.local/services/progress-service/internal/progress/service"
 )
 
@@ -32,7 +34,7 @@ func NewProgressHandler(progressService service.IProgressService) IProgressHandl
 // @Produce json
 // @Security BearerAuth
 // @Param userId path string true "User ID"
-// @Success 200 {object} response.SuccessResponse{data=service.ProgressResponse}
+// @Success 200 {object} response.SuccessResponse{data=response.ProgressResponse}
 // @Failure 400 {object} response.ErrorResponse
 // @Failure 500 {object} response.ErrorResponse
 // @Router /api/v1/progress/{userId} [get]
@@ -55,14 +57,14 @@ func (h *progressHandler) GetProgress(c *fiber.Ctx) error {
 // @Produce json
 // @Security BearerAuth
 // @Param userId path string true "User ID"
-// @Param request body service.AddWeightRequest true "Add Weight Request"
+// @Param request body requestdto.AddWeightRequest true "Add Weight Request"
 // @Success 200 {object} response.SuccessResponse{data=repository.WeightLog}
 // @Failure 400 {object} response.ErrorResponse
 // @Failure 500 {object} response.ErrorResponse
 // @Router /api/v1/progress/{userId}/weight [post]
 func (h *progressHandler) AddWeight(c *fiber.Ctx) error {
 	userID := c.Params("userId")
-	var req service.AddWeightRequest
+	var req requestdto.AddWeightRequest
 
 	if err := c.BodyParser(&req); err != nil {
 		return response.Error(c, fiber.StatusBadRequest, "invalid request body")
@@ -106,14 +108,14 @@ func (h *progressHandler) GetWeeklySummary(c *fiber.Ctx) error {
 // @Produce json
 // @Security BearerAuth
 // @Param userId path string true "User ID"
-// @Param request body service.AddHabitRequest true "Add Habit Request"
+// @Param request body requestdto.AddHabitRequest true "Add Habit Request"
 // @Success 200 {object} response.SuccessResponse{data=repository.HabitLog}
 // @Failure 400 {object} response.ErrorResponse
 // @Failure 500 {object} response.ErrorResponse
 // @Router /api/v1/progress/{userId}/habits [post]
 func (h *progressHandler) AddHabit(c *fiber.Ctx) error {
 	userID := c.Params("userId")
-	var req service.AddHabitRequest
+	var req requestdto.AddHabitRequest
 
 	if err := c.BodyParser(&req); err != nil {
 		return response.Error(c, fiber.StatusBadRequest, "invalid request body")

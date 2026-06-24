@@ -103,7 +103,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/service.CreateUploadRequest"
+                            "$ref": "#/definitions/request.CreateUploadRequest"
                         }
                     }
                 ],
@@ -187,7 +187,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/service.UploadDetailResponse"
+                                            "$ref": "#/definitions/response.UploadDetailResponse"
                                         }
                                     }
                                 }
@@ -311,6 +311,20 @@ const docTemplate = `{
                 }
             }
         },
+        "request.CreateUploadRequest": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "uploadType": {
+                    "type": "string"
+                }
+            }
+        },
         "response.ErrorResponse": {
             "type": "object",
             "properties": {
@@ -337,21 +351,7 @@ const docTemplate = `{
                 }
             }
         },
-        "service.CreateUploadRequest": {
-            "type": "object",
-            "properties": {
-                "description": {
-                    "type": "string"
-                },
-                "title": {
-                    "type": "string"
-                },
-                "uploadType": {
-                    "type": "string"
-                }
-            }
-        },
-        "service.UploadDetailResponse": {
+        "response.UploadDetailResponse": {
             "type": "object",
             "properties": {
                 "metadata": {
