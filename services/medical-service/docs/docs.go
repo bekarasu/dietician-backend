@@ -15,7 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/v1/medical/{userId}/uploads": {
+        "/api/v1/uploads": {
             "get": {
                 "security": [
                     {
@@ -33,15 +33,6 @@ const docTemplate = `{
                     "Medical Uploads"
                 ],
                 "summary": "List Medical Uploads",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "userId",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -80,7 +71,7 @@ const docTemplate = `{
                 ],
                 "description": "Create a new medical upload record for a user",
                 "consumes": [
-                    "application/json"
+                    "multipart/form-data"
                 ],
                 "produces": [
                     "application/json"
@@ -92,19 +83,30 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "User ID",
-                        "name": "userId",
-                        "in": "path",
+                        "description": "Upload Type",
+                        "name": "uploadType",
+                        "in": "formData",
                         "required": true
                     },
                     {
-                        "description": "Create Upload Request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/request.CreateUploadRequest"
-                        }
+                        "type": "string",
+                        "description": "Title",
+                        "name": "title",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Description",
+                        "name": "description",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "file",
+                        "description": "File to upload",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -141,7 +143,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/medical/{userId}/uploads/{uploadId}": {
+        "/api/v1/uploads/{uploadId}": {
             "get": {
                 "security": [
                     {
@@ -160,13 +162,6 @@ const docTemplate = `{
                 ],
                 "summary": "Get Medical Upload Details",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "userId",
-                        "in": "path",
-                        "required": true
-                    },
                     {
                         "type": "integer",
                         "description": "Upload ID",
@@ -226,13 +221,6 @@ const docTemplate = `{
                 ],
                 "summary": "Delete Medical Upload",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "userId",
-                        "in": "path",
-                        "required": true
-                    },
                     {
                         "type": "integer",
                         "description": "Upload ID",
@@ -307,20 +295,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "userId": {
-                    "type": "string"
-                }
-            }
-        },
-        "request.CreateUploadRequest": {
-            "type": "object",
-            "properties": {
-                "description": {
-                    "type": "string"
-                },
-                "title": {
-                    "type": "string"
-                },
-                "uploadType": {
                     "type": "string"
                 }
             }

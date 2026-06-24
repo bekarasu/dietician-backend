@@ -9,19 +9,20 @@ package medicalservice
 import (
 	"dietician.local/services/medical-service/config"
 	"dietician.local/services/medical-service/internal"
-	"dietician.local/services/medical-service/internal/medical/handler"
-	"dietician.local/services/medical-service/internal/medical/repository"
-	"dietician.local/services/medical-service/internal/medical/service"
 	"dietician.local/services/medical-service/internal/storage"
+	"dietician.local/services/medical-service/internal/uploads/handler"
+	"dietician.local/services/medical-service/internal/uploads/repository"
+	"dietician.local/services/medical-service/internal/uploads/service"
 	"github.com/google/wire"
 	"github.com/jmoiron/sqlx"
+	"github.com/sirupsen/logrus"
 )
 
 // Injectors from wire.go:
 
-func InitRoute(db *sqlx.DB, cfg *config.MedicalAppScheme, provider storage.Provider) internal.IRoute {
+func InitRoute(db *sqlx.DB, cfg *config.MedicalAppScheme, provider storage.Provider, logger *logrus.Logger) internal.IRoute {
 	iMedicalRepository := repository.NewMedicalRepository(db)
-	iMedicalService := service.NewMedicalService(iMedicalRepository, provider)
+	iMedicalService := service.NewMedicalService(iMedicalRepository, provider, logger)
 	iMedicalHandler := handler.NewMedicalHandler(iMedicalService)
 	iRoute := internal.NewRoute(iMedicalHandler)
 	return iRoute

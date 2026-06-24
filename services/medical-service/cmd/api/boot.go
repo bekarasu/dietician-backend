@@ -1,28 +1,24 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
+	"github.com/redis/go-redis/v9"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/text/language"
 
 	"dietician.local/packages/localizer"
 	"dietician.local/packages/logging"
+	"dietician.local/packages/tokenizer"
 	"dietician.local/services/medical-service/config"
 	"dietician.local/services/medical-service/internal/storage"
 )
-
-type application struct {
-	logger          *logrus.Logger
-	cfg             *config.MedicalAppScheme
-	languageBundle  *i18n.Bundle
-	db              *sqlx.DB
-	storageProvider storage.Provider
-}
 
 func boot(logger *logrus.Logger, cfg *config.MedicalAppScheme) (*application, error) {
 	db, err := initPostgres(cfg, logger)
@@ -30,9 +26,15 @@ func boot(logger *logrus.Logger, cfg *config.MedicalAppScheme) (*application, er
 		return nil, fmt.Errorf("postgres initialization: %v", err)
 	}
 
-	bundle := initLocalizer(cfg)
+	rdb := initRedis(cfg, logger)
 
-	// In a real app, initialize S3 here
+	tok := tokenizer.NewTokenizer(tokenizer.Config{
+		Secret: cfg.JWT.Secret,
+	}, rdb)
+
+	bundle := initLocalizer()
+
+	// TODO In a real app, initialize S3 here
 	sp := storage.NewNoOpStorageProvider(logger)
 
 	return &application{
@@ -40,7 +42,9 @@ func boot(logger *logrus.Logger, cfg *config.MedicalAppScheme) (*application, er
 		cfg:             cfg,
 		languageBundle:  bundle,
 		db:              db,
+		rdb:             rdb,
 		storageProvider: sp,
+		tokenizer:       tok,
 	}, nil
 }
 
@@ -57,7 +61,7 @@ func initLogger(cfg *config.MedicalAppScheme) *logrus.Logger {
 	})
 }
 
-func initLocalizer(cfg *config.MedicalAppScheme) *i18n.Bundle {
+func initLocalizer() *i18n.Bundle {
 	return localizer.InitLocalizer(localizer.Config{
 		Default: language.Turkish,
 		Languages: []language.Tag{
@@ -77,4 +81,24 @@ func initPostgres(cfg *config.MedicalAppScheme, logger *logrus.Logger) (*sqlx.DB
 	db.SetConnMaxLifetime(5 * time.Minute)
 	logger.Info("connected to postgres")
 	return db, nil
+}
+
+func initRedis(cfg *config.MedicalAppScheme, logger *logrus.Logger) *redis.Client {
+	dbNum, _ := strconv.Atoi(cfg.Redis.DB)
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     cfg.Redis.Addr(),
+		Password: cfg.Redis.Password,
+		DB:       dbNum,
+	})
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err := rdb.Ping(ctx).Err(); err != nil {
+		logger.WithError(err).Warn("redis not available")
+	} else {
+		logger.Info("connected to redis")
+	}
+
+	return rdb
 }

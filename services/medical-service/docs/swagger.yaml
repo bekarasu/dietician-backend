@@ -30,15 +30,6 @@ definitions:
       userId:
         type: string
     type: object
-  request.CreateUploadRequest:
-    properties:
-      description:
-        type: string
-      title:
-        type: string
-      uploadType:
-        type: string
-    type: object
   response.ErrorResponse:
     properties:
       code:
@@ -72,17 +63,11 @@ info:
   title: Medical Service API
   version: "1.0"
 paths:
-  /api/v1/medical/{userId}/uploads:
+  /api/v1/uploads:
     get:
       consumes:
       - application/json
       description: Retrieve a list of medical uploads for a specific user
-      parameters:
-      - description: User ID
-        in: path
-        name: userId
-        required: true
-        type: string
       produces:
       - application/json
       responses:
@@ -108,20 +93,28 @@ paths:
       - Medical Uploads
     post:
       consumes:
-      - application/json
+      - multipart/form-data
       description: Create a new medical upload record for a user
       parameters:
-      - description: User ID
-        in: path
-        name: userId
+      - description: Upload Type
+        in: formData
+        name: uploadType
         required: true
         type: string
-      - description: Create Upload Request
-        in: body
-        name: request
+      - description: Title
+        in: formData
+        name: title
         required: true
-        schema:
-          $ref: '#/definitions/request.CreateUploadRequest'
+        type: string
+      - description: Description
+        in: formData
+        name: description
+        type: string
+      - description: File to upload
+        in: formData
+        name: file
+        required: true
+        type: file
       produces:
       - application/json
       responses:
@@ -147,17 +140,12 @@ paths:
       summary: Create Medical Upload
       tags:
       - Medical Uploads
-  /api/v1/medical/{userId}/uploads/{uploadId}:
+  /api/v1/uploads/{uploadId}:
     delete:
       consumes:
       - application/json
       description: Delete a specific medical upload and its associated files
       parameters:
-      - description: User ID
-        in: path
-        name: userId
-        required: true
-        type: string
       - description: Upload ID
         in: path
         name: uploadId
@@ -189,11 +177,6 @@ paths:
       description: Retrieve the details of a specific medical upload, including file
         metadata
       parameters:
-      - description: User ID
-        in: path
-        name: userId
-        required: true
-        type: string
       - description: Upload ID
         in: path
         name: uploadId
