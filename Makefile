@@ -1,7 +1,19 @@
-.PHONY: up down build logs health test
+.PHONY: up up-dev down build logs health test swag tidy
 
 up:
-	docker compose up --build
+	docker compose -f docker-compose.dev.yml up
+
+# Allows passing arguments to specific commands, e.g., make up-dev --build service_name
+ifneq (,$(filter $(firstword $(MAKECMDGOALS)),up-dev up-infra))
+  RUN_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
+  $(eval $(RUN_ARGS):;@:)
+endif
+
+up-dev:
+	docker compose -f docker-compose.dev.yml up $(RUN_ARGS)
+
+up-infra:
+	docker compose -f docker-compose.infra.yml up $(RUN_ARGS)
 
 up-d:
 	docker compose up --build -d
@@ -51,3 +63,19 @@ test-v:
 		dietician.local/services/progress-service/... \
 		dietician.local/services/recommendation-service/... \
 		dietician.local/services/medical-service/... \
+
+swag:
+	@for d in services/*; do \
+		if [ -f "$$d/Makefile" ]; then \
+			echo "=== Running make swag for $$d ==="; \
+			$(MAKE) -C "$$d" swag || true; \
+		fi \
+	done
+
+tidy:
+	@for d in services/*; do \
+		if [ -f "$$d/go.mod" ]; then \
+			echo "=== Running go mod tidy for $$d ==="; \
+			(cd "$$d" && go mod tidy); \
+		fi \
+	done
