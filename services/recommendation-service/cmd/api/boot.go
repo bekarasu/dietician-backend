@@ -11,13 +11,6 @@ import (
 	"dietician.local/services/recommendation-service/config"
 )
 
-type application struct {
-	logger         *logrus.Logger
-	cfg            *config.RecommendationAppScheme
-	languageBundle *i18n.Bundle
-	openaiService  openai.Service
-}
-
 func boot(logger *logrus.Logger, cfg *config.RecommendationAppScheme) (*application, error) {
 	bundle := initLocalizer(cfg)
 

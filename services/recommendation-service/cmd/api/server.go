@@ -5,13 +5,24 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/nicksnyder/go-i18n/v2/i18n"
+	"github.com/sirupsen/logrus"
 
 	"dietician.local/packages/middleware"
+	"dietician.local/packages/openai"
 	"dietician.local/packages/swagger"
 	recoservice "dietician.local/services/recommendation-service"
+	"dietician.local/services/recommendation-service/config"
 	_ "dietician.local/services/recommendation-service/docs"
 	"dietician.local/services/recommendation-service/internal"
 )
+
+type application struct {
+	logger         *logrus.Logger
+	cfg            *config.RecommendationAppScheme
+	languageBundle *i18n.Bundle
+	openaiService  openai.Service
+}
 
 type Server struct {
 	app *application

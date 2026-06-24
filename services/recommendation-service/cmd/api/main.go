@@ -1,5 +1,22 @@
 package main
 
+// @title Recommendation Service API
+// @version 1.0
+// @description This is the recommendation service for the dietician backend.
+// @termsOfService http://swagger.io/terms/
+
+// @contact.name API Support
+// @contact.email support@dietician.local
+
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host localhost:8081
+// @BasePath /
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+
 import (
 	"context"
 	"log"
@@ -8,15 +25,6 @@ import (
 	"syscall"
 	"time"
 )
-
-// @title Recommendation Service API
-// @version 1.0
-// @description This is the recommendation service for the dietician backend.
-// @host localhost:8081
-// @BasePath /
-// @securityDefinitions.apikey BearerAuth
-// @in header
-// @name Authorization
 
 func main() {
 	cfg, err := initConfig()

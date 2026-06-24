@@ -15,13 +15,6 @@ import (
 	"dietician.local/services/progress-service/config"
 )
 
-type application struct {
-	logger         *logrus.Logger
-	cfg            *config.ProgressAppScheme
-	languageBundle *i18n.Bundle
-	db             *sqlx.DB
-}
-
 func boot(logger *logrus.Logger, cfg *config.ProgressAppScheme) (*application, error) {
 	db, err := initPostgres(cfg, logger)
 	if err != nil {
