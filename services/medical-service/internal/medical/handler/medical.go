@@ -6,7 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	"dietician.local/packages/response"
-	requestdto "dietician.local/services/medical-service/internal/medical/dto/request"
+	"dietician.local/services/medical-service/internal/medical/dto/request"
 	_ "dietician.local/services/medical-service/internal/medical/dto/response"
 	"dietician.local/services/medical-service/internal/medical/service"
 )
@@ -43,7 +43,7 @@ func NewMedicalHandler(medService service.IMedicalService) IMedicalHandler {
 // @Router /api/v1/medical/{userId}/uploads [post]
 func (h *medicalHandler) CreateUpload(c *fiber.Ctx) error {
 	userID := c.Params("userId")
-	var req requestdto.CreateUploadRequest
+	var req request.CreateUploadRequest
 
 	if err := c.BodyParser(&req); err != nil {
 		return response.Error(c, fiber.StatusBadRequest, "invalid request body")
