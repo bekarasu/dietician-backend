@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 
 	"dietician.local/services/medical-service/internal/storage"
 	"dietician.local/services/medical-service/internal/uploads/dto/request"
@@ -13,8 +14,8 @@ import (
 type IMedicalService interface {
 	CreateUpload(ctx context.Context, userID string, req request.CreateUploadRequest) (*repository.MedicalUpload, error)
 	ListUploads(ctx context.Context, userID string) ([]repository.MedicalUpload, error)
-	GetUploadDetail(ctx context.Context, userID string, uploadID int64) (*response.UploadDetailResponse, error)
-	DeleteUpload(ctx context.Context, userID string, uploadID int64) error
+	GetUploadDetail(ctx context.Context, userID string, uploadID string) (*response.UploadDetailResponse, error)
+	DeleteUpload(ctx context.Context, userID string, uploadID string) error
 }
 
 type medicalService struct {
@@ -40,12 +41,32 @@ func (s *medicalService) CreateUpload(ctx context.Context, userID string, req re
 		Status:      "pending",
 	}
 
-	s.logger.Info(upload)
-
 	err := s.repo.CreateUpload(ctx, upload)
 	if err != nil {
-		s.logger.Error("Failed to create upload", err)
+		s.logger.WithError(err).Error("Failed to create upload")
 		return nil, err
+	}
+
+	if req.File != nil {
+		storageKey := fmt.Sprintf("medicaluploads/%s/%s/%s", userID, upload.ID, req.File.FileName)
+
+		_, err := s.provider.Upload(ctx, storageKey, req.File.Data, req.File.ContentType)
+		if err != nil {
+			s.logger.WithError(err).Error("Failed to upload file to storage")
+			return nil, err
+		}
+
+		meta := &repository.MedicalFileMetadata{
+			UploadID:    upload.ID,
+			FileName:    req.File.FileName,
+			FileSize:    req.File.FileSize,
+			ContentType: req.File.ContentType,
+			StorageKey:  storageKey,
+		}
+		if err := s.repo.CreateFileMetadata(ctx, meta); err != nil {
+			s.logger.WithError(err).Error("Failed to create file metadata")
+			return nil, err
+		}
 	}
 
 	return upload, nil
@@ -55,7 +76,7 @@ func (s *medicalService) ListUploads(ctx context.Context, userID string) ([]repo
 	return s.repo.GetUploadsByUserID(ctx, userID)
 }
 
-func (s *medicalService) GetUploadDetail(ctx context.Context, userID string, uploadID int64) (*response.UploadDetailResponse, error) {
+func (s *medicalService) GetUploadDetail(ctx context.Context, userID string, uploadID string) (*response.UploadDetailResponse, error) {
 	upload, err := s.repo.GetUploadByID(ctx, uploadID)
 	if err != nil {
 		return nil, err
@@ -72,7 +93,7 @@ func (s *medicalService) GetUploadDetail(ctx context.Context, userID string, upl
 	}, nil
 }
 
-func (s *medicalService) DeleteUpload(ctx context.Context, userID string, uploadID int64) error {
+func (s *medicalService) DeleteUpload(ctx context.Context, userID string, uploadID string) error {
 	metadata, err := s.repo.GetFileMetadataByUploadID(ctx, uploadID)
 	if err == nil {
 		for _, m := range metadata {

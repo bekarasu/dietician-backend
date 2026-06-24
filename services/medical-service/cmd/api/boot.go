@@ -28,14 +28,14 @@ func boot(logger *logrus.Logger, cfg *config.MedicalAppScheme) (*application, er
 
 	rdb := initRedis(cfg, logger)
 
-	tok := tokenizer.NewTokenizer(tokenizer.Config{
+	tok := tokenizer.NewTokenVerifier(tokenizer.Config{
 		Secret: cfg.JWT.Secret,
 	}, rdb)
 
 	bundle := initLocalizer()
 
-	// TODO In a real app, initialize S3 here
-	sp := storage.NewNoOpStorageProvider(logger)
+	// Local file storage (swap for S3 etc. in production)
+	sp := storage.NewLocalStorageProvider("./uploads", logger)
 
 	return &application{
 		logger:          logger,

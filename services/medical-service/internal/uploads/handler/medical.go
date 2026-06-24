@@ -1,8 +1,6 @@
 package handler
 
 import (
-	"strconv"
-
 	"github.com/gofiber/fiber/v2"
 
 	"dietician.local/packages/middleware"
@@ -51,11 +49,29 @@ func (h *medicalHandler) CreateUpload(c *fiber.Ctx) error {
 	if err != nil {
 		return response.Error(c, fiber.StatusBadRequest, "file is required")
 	}
-	_ = file // TODO: Pass file to service when ready
 
 	var req request.CreateUploadRequest
 	if err := c.BodyParser(&req); err != nil {
 		return response.Error(c, fiber.StatusBadRequest, "invalid request body")
+	}
+
+	// Read file content
+	src, err := file.Open()
+	if err != nil {
+		return response.Error(c, fiber.StatusInternalServerError, "failed to open file")
+	}
+	defer src.Close()
+
+	buf := make([]byte, file.Size)
+	if _, err := src.Read(buf); err != nil {
+		return response.Error(c, fiber.StatusInternalServerError, "failed to read file")
+	}
+
+	req.File = &request.FileData{
+		FileName:    file.Filename,
+		FileSize:    file.Size,
+		ContentType: file.Header.Get("Content-Type"),
+		Data:        buf,
 	}
 
 	res, err := h.medService.CreateUpload(c.Context(), userID, req)
@@ -101,8 +117,8 @@ func (h *medicalHandler) ListUploads(c *fiber.Ctx) error {
 // @Router /api/v1/uploads/{uploadId} [get]
 func (h *medicalHandler) GetUploadDetail(c *fiber.Ctx) error {
 	userID := middleware.GetUserID(c.UserContext())
-	uploadID, err := strconv.ParseInt(c.Params("uploadId"), 10, 64)
-	if err != nil {
+	uploadID := c.Params("uploadId")
+	if uploadID == "" {
 		return response.Error(c, fiber.StatusBadRequest, "invalid upload id")
 	}
 
@@ -128,12 +144,12 @@ func (h *medicalHandler) GetUploadDetail(c *fiber.Ctx) error {
 // @Router /api/v1/uploads/{uploadId} [delete]
 func (h *medicalHandler) DeleteUpload(c *fiber.Ctx) error {
 	userID := middleware.GetUserID(c.UserContext())
-	uploadID, err := strconv.ParseInt(c.Params("uploadId"), 10, 64)
-	if err != nil {
+	uploadID := c.Params("uploadId")
+	if uploadID == "" {
 		return response.Error(c, fiber.StatusBadRequest, "invalid upload id")
 	}
 
-	err = h.medService.DeleteUpload(c.Context(), userID, uploadID)
+	err := h.medService.DeleteUpload(c.Context(), userID, uploadID)
 	if err != nil {
 		return response.Error(c, fiber.StatusInternalServerError, "failed to delete upload")
 	}

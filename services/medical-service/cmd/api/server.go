@@ -28,7 +28,7 @@ type application struct {
 	db              *sqlx.DB
 	rdb             *redis.Client
 	storageProvider storage.Provider
-	tokenizer       tokenizer.ITokenizer
+	tokenizer       tokenizer.ITokenVerifier
 }
 
 type Server struct {
