@@ -1,15 +1,4 @@
 services:
-  api-gateway:
-    container_name: dietician-api-gateway
-    build:
-      context: ./services/gateway
-      dockerfile: deployments/dev/Dockerfile
-    ports:
-      - "80:80"
-    volumes:
-      - ./services/gateway:/app/services/gateway
-      - ./packages:/app/packages
-
   account-service:
     container_name: dietician-account-service
     build:
