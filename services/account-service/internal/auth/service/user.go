@@ -18,6 +18,7 @@ type IUserService interface {
 	Login(ctx context.Context, req model.LoginRequest) (*model.AuthResponse, error)
 	Refresh(ctx context.Context, req model.RefreshRequest) (*model.AuthResponse, error)
 	GetMe(ctx context.Context, userID string) (*model.User, error)
+	Logout(ctx context.Context, userID string, accessToken string) error
 }
 
 type UserService struct {
@@ -219,9 +220,25 @@ func (s *UserService) GetMe(ctx context.Context, userID string) (*model.User, er
 	return user, nil
 }
 
+func (s *UserService) Logout(ctx context.Context, userID string, accessToken string) error {
+	if err := s.refreshTokenSvc.DeleteRefreshTokensByUserID(ctx, userID); err != nil {
+		return err
+	}
+	if accessToken != "" {
+		if err := s.tokenizer.RemoveJWTFromRedis(ctx, accessToken); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (s *UserService) generateTokens(ctx context.Context, user *model.User) (*model.AuthResponse, error) {
 	accessStr, err := s.refreshTokenSvc.GenerateAccessToken(user.ID, user.Email)
 	if err != nil {
+		return nil, err
+	}
+
+	if err := s.tokenizer.StoreJWTInRedis(ctx, accessStr, s.refreshTokenSvc.AccessTTL()); err != nil {
 		return nil, err
 	}
 

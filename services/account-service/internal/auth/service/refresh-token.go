@@ -20,6 +20,7 @@ type IRefreshTokenService interface {
 	GenerateRefreshToken() (string, error)
 	ValidateAccessToken(tokenString string) (string, error)
 	RefreshTTL() time.Duration
+	AccessTTL() time.Duration
 
 	CreateRefreshToken(ctx context.Context, token *model.RefreshToken) error
 	GetRefreshToken(ctx context.Context, token string) (*model.RefreshToken, error)

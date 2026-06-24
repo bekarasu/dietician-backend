@@ -42,6 +42,7 @@ func (r *route) authRoutes(app *fiber.App) {
 	authGroup.Post("/verify-otp", r.authHandler.VerifyOTP)
 	authGroup.Post("/login", r.authHandler.Login)
 	authGroup.Post("/refresh", r.authHandler.Refresh)
+	authGroup.Post("/logout", middleware.UserAuthMiddleware, r.authHandler.Logout)
 }
 
 func (r *route) profileRoutes(app *fiber.App) {

@@ -3,6 +3,7 @@ package handler
 import (
 	"github.com/gofiber/fiber/v2"
 
+	"dietician.local/packages/middleware"
 	pkgresponse "dietician.local/packages/response"
 	"dietician.local/packages/validation"
 	"dietician.local/services/account-service/internal/auth/model"
@@ -16,6 +17,7 @@ type IAuthHandler interface {
 	VerifyOTP(c *fiber.Ctx) error
 	Login(c *fiber.Ctx) error
 	Refresh(c *fiber.Ctx) error
+	Logout(c *fiber.Ctx) error
 }
 
 type AuthHandler struct {
@@ -178,4 +180,30 @@ func (h *AuthHandler) Refresh(c *fiber.Ctx) error {
 	}
 
 	return pkgresponse.Success(c, "token refreshed", dtoResp)
+}
+
+// Logout authenticates a user and invalidates their tokens.
+// @Summary Logout
+// @Description Logout user and invalidate access/refresh tokens
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Success 200 {object} pkgresponse.SuccessResponse
+// @Failure 401 {object} pkgresponse.ErrorResponse
+// @Security BearerAuth
+// @Router /api/v1/auth/logout [post]
+func (h *AuthHandler) Logout(c *fiber.Ctx) error {
+	userID := middleware.GetUserID(c.UserContext())
+	if userID == "" {
+		return pkgresponse.Error(c, fiber.StatusUnauthorized, "unauthorized")
+	}
+
+	token := middleware.ExtractBearerToken(c)
+
+	err := h.authService.Logout(c.UserContext(), userID, token)
+	if err != nil {
+		return pkgresponse.Error(c, fiber.StatusInternalServerError, err.Error())
+	}
+
+	return pkgresponse.Success(c, "logout successful 3", nil)
 }
