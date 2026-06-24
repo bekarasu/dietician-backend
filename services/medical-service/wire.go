@@ -12,6 +12,7 @@ import (
 	"dietician.local/services/medical-service/internal"
 	"dietician.local/services/medical-service/internal/storage"
 	"dietician.local/services/medical-service/internal/uploads/handler"
+	"dietician.local/services/medical-service/internal/uploads/orchestration"
 	"dietician.local/services/medical-service/internal/uploads/repository"
 	"dietician.local/services/medical-service/internal/uploads/service"
 )
@@ -19,6 +20,7 @@ import (
 var medicalSet = wire.NewSet(
 	repository.NewMedicalRepository,
 	service.NewMedicalService,
+	orchestration.NewMedicalOrchestrator,
 	handler.NewMedicalHandler,
 )
 

@@ -11,9 +11,11 @@ import (
 	"dietician.local/services/account-service/config"
 	"dietician.local/services/account-service/internal"
 	"dietician.local/services/account-service/internal/auth/handler"
+	"dietician.local/services/account-service/internal/auth/orchestration"
 	"dietician.local/services/account-service/internal/auth/repository"
 	"dietician.local/services/account-service/internal/auth/service"
 	handler2 "dietician.local/services/account-service/internal/profile/handler"
+	orchestration2 "dietician.local/services/account-service/internal/profile/orchestration"
 	repository2 "dietician.local/services/account-service/internal/profile/repository"
 	service2 "dietician.local/services/account-service/internal/profile/service"
 	"github.com/google/wire"
@@ -31,10 +33,12 @@ func InitRoute(db *sqlx.DB, cfg *config.AccountAppScheme, sender service.EmailSe
 	iotpRepository := repository.NewOTPRepository(db)
 	iotpService := service.NewOTPService(sender, cfg, iotpRepository)
 	iUserService := service.NewUserService(iUserRepository, iRefreshTokenService, iotpService, tok)
-	iAuthHandler := handler.NewAuthHandler(iUserService)
+	iAuthOrchestrator := orchestration.NewAuthOrchestrator(iUserService)
+	iAuthHandler := handler.NewAuthHandler(iAuthOrchestrator)
 	profileRepository := repository2.NewProfileRepository(db)
 	profileService := service2.NewProfileService(profileRepository)
-	iProfileHandler := handler2.NewProfileHandler(profileService)
+	iProfileOrchestrator := orchestration2.NewProfileOrchestrator(profileService)
+	iProfileHandler := handler2.NewProfileHandler(iProfileOrchestrator)
 	iRoute := internal.NewRoute(iAuthHandler, iProfileHandler)
 	return iRoute
 }
@@ -42,7 +46,7 @@ func InitRoute(db *sqlx.DB, cfg *config.AccountAppScheme, sender service.EmailSe
 // wire.go:
 
 // authSet wires authentication dependencies
-var authSet = wire.NewSet(repository.NewUserRepository, repository.NewRefreshTokenRepository, repository.NewOTPRepository, service.NewOTPService, service.NewRefreshTokenService, service.NewUserService, handler.NewAuthHandler)
+var authSet = wire.NewSet(repository.NewUserRepository, repository.NewRefreshTokenRepository, repository.NewOTPRepository, service.NewOTPService, service.NewRefreshTokenService, service.NewUserService, orchestration.NewAuthOrchestrator, handler.NewAuthHandler)
 
 // profileSet wires profile dependencies
-var profileSet = wire.NewSet(repository2.NewProfileRepository, service2.NewProfileService, handler2.NewProfileHandler)
+var profileSet = wire.NewSet(repository2.NewProfileRepository, service2.NewProfileService, orchestration2.NewProfileOrchestrator, handler2.NewProfileHandler)

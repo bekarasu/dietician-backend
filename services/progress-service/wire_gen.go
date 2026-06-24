@@ -9,6 +9,7 @@ package progressservice
 import (
 	"dietician.local/services/progress-service/internal"
 	"dietician.local/services/progress-service/internal/progress/handler"
+	"dietician.local/services/progress-service/internal/progress/orchestration"
 	"dietician.local/services/progress-service/internal/progress/repository"
 	"dietician.local/services/progress-service/internal/progress/service"
 	"github.com/google/wire"
@@ -20,11 +21,12 @@ import (
 func InitRoute(db *sqlx.DB) internal.IRoute {
 	iProgressRepository := repository.NewProgressRepository(db)
 	iProgressService := service.NewProgressService(iProgressRepository)
-	iProgressHandler := handler.NewProgressHandler(iProgressService)
+	iProgressOrchestrator := orchestration.NewProgressOrchestrator(iProgressService)
+	iProgressHandler := handler.NewProgressHandler(iProgressOrchestrator)
 	iRoute := internal.NewRoute(iProgressHandler)
 	return iRoute
 }
 
 // wire.go:
 
-var progressSet = wire.NewSet(repository.NewProgressRepository, service.NewProgressService, handler.NewProgressHandler)
+var progressSet = wire.NewSet(repository.NewProgressRepository, service.NewProgressService, orchestration.NewProgressOrchestrator, handler.NewProgressHandler)

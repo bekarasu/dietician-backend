@@ -5,7 +5,7 @@ import (
 
 	"dietician.local/packages/openai"
 	"dietician.local/packages/response"
-	"dietician.local/services/recommendation-service/internal/recommendation/service"
+	"dietician.local/services/recommendation-service/internal/recommendation/orchestration"
 )
 
 type IRecommendationHandler interface {
@@ -13,12 +13,12 @@ type IRecommendationHandler interface {
 }
 
 type recommendationHandler struct {
-	recoService service.IRecommendationService
+	recoOrchestrator orchestration.IRecommendationOrchestrator
 }
 
-func NewRecommendationHandler(recoService service.IRecommendationService) IRecommendationHandler {
+func NewRecommendationHandler(recoOrchestrator orchestration.IRecommendationOrchestrator) IRecommendationHandler {
 	return &recommendationHandler{
-		recoService: recoService,
+		recoOrchestrator: recoOrchestrator,
 	}
 }
 
@@ -29,7 +29,7 @@ func (h *recommendationHandler) CreateDietRecommendations(c *fiber.Ctx) error {
 		return response.Error(c, fiber.StatusBadRequest, "invalid request body")
 	}
 
-	res, err := h.recoService.CreateDietRecommendations(c.Context(), req)
+	res, err := h.recoOrchestrator.CreateDietRecommendations(c.Context(), req)
 	if err != nil {
 		return response.Error(c, fiber.StatusInternalServerError, "failed to generate recommendations")
 	}

@@ -7,7 +7,7 @@ import (
 	"dietician.local/packages/response"
 	"dietician.local/services/medical-service/internal/uploads/dto/request"
 	_ "dietician.local/services/medical-service/internal/uploads/dto/response"
-	"dietician.local/services/medical-service/internal/uploads/service"
+	"dietician.local/services/medical-service/internal/uploads/orchestration"
 )
 
 type IMedicalHandler interface {
@@ -18,12 +18,12 @@ type IMedicalHandler interface {
 }
 
 type medicalHandler struct {
-	medService service.IMedicalService
+	medOrchestrator orchestration.IMedicalOrchestrator
 }
 
-func NewMedicalHandler(medService service.IMedicalService) IMedicalHandler {
+func NewMedicalHandler(medOrchestrator orchestration.IMedicalOrchestrator) IMedicalHandler {
 	return &medicalHandler{
-		medService: medService,
+		medOrchestrator: medOrchestrator,
 	}
 }
 
@@ -74,7 +74,7 @@ func (h *medicalHandler) CreateUpload(c *fiber.Ctx) error {
 		Data:        buf,
 	}
 
-	res, err := h.medService.CreateUpload(c.Context(), userID, req)
+	res, err := h.medOrchestrator.CreateUpload(c.Context(), userID, req)
 	if err != nil {
 		return response.Error(c, fiber.StatusInternalServerError, "failed to create upload")
 	}
@@ -95,7 +95,7 @@ func (h *medicalHandler) CreateUpload(c *fiber.Ctx) error {
 func (h *medicalHandler) ListUploads(c *fiber.Ctx) error {
 	userID := middleware.GetUserID(c.UserContext())
 
-	res, err := h.medService.ListUploads(c.Context(), userID)
+	res, err := h.medOrchestrator.ListUploads(c.Context(), userID)
 	if err != nil {
 		return response.Error(c, fiber.StatusInternalServerError, "failed to list uploads")
 	}
@@ -122,7 +122,7 @@ func (h *medicalHandler) GetUploadDetail(c *fiber.Ctx) error {
 		return response.Error(c, fiber.StatusBadRequest, "invalid upload id")
 	}
 
-	res, err := h.medService.GetUploadDetail(c.Context(), userID, uploadID)
+	res, err := h.medOrchestrator.GetUploadDetail(c.Context(), userID, uploadID)
 	if err != nil {
 		return response.Error(c, fiber.StatusInternalServerError, "failed to get upload details")
 	}
@@ -149,7 +149,7 @@ func (h *medicalHandler) DeleteUpload(c *fiber.Ctx) error {
 		return response.Error(c, fiber.StatusBadRequest, "invalid upload id")
 	}
 
-	err := h.medService.DeleteUpload(c.Context(), userID, uploadID)
+	err := h.medOrchestrator.DeleteUpload(c.Context(), userID, uploadID)
 	if err != nil {
 		return response.Error(c, fiber.StatusInternalServerError, "failed to delete upload")
 	}

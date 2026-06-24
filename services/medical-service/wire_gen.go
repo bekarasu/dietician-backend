@@ -11,6 +11,7 @@ import (
 	"dietician.local/services/medical-service/internal"
 	"dietician.local/services/medical-service/internal/storage"
 	"dietician.local/services/medical-service/internal/uploads/handler"
+	"dietician.local/services/medical-service/internal/uploads/orchestration"
 	"dietician.local/services/medical-service/internal/uploads/repository"
 	"dietician.local/services/medical-service/internal/uploads/service"
 	"github.com/google/wire"
@@ -23,11 +24,12 @@ import (
 func InitRoute(db *sqlx.DB, cfg *config.MedicalAppScheme, provider storage.Provider, logger *logrus.Logger) internal.IRoute {
 	iMedicalRepository := repository.NewMedicalRepository(db)
 	iMedicalService := service.NewMedicalService(iMedicalRepository, provider, logger)
-	iMedicalHandler := handler.NewMedicalHandler(iMedicalService)
+	iMedicalOrchestrator := orchestration.NewMedicalOrchestrator(iMedicalService)
+	iMedicalHandler := handler.NewMedicalHandler(iMedicalOrchestrator)
 	iRoute := internal.NewRoute(iMedicalHandler)
 	return iRoute
 }
 
 // wire.go:
 
-var medicalSet = wire.NewSet(repository.NewMedicalRepository, service.NewMedicalService, handler.NewMedicalHandler)
+var medicalSet = wire.NewSet(repository.NewMedicalRepository, service.NewMedicalService, orchestration.NewMedicalOrchestrator, handler.NewMedicalHandler)

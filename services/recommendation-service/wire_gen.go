@@ -11,6 +11,7 @@ import (
 	"dietician.local/services/recommendation-service/config"
 	"dietician.local/services/recommendation-service/internal"
 	"dietician.local/services/recommendation-service/internal/recommendation/handler"
+	"dietician.local/services/recommendation-service/internal/recommendation/orchestration"
 	"dietician.local/services/recommendation-service/internal/recommendation/service"
 	"github.com/google/wire"
 )
@@ -19,11 +20,12 @@ import (
 
 func InitRoute(cfg *config.RecommendationAppScheme, openaiService openai.Service) internal.IRoute {
 	iRecommendationService := service.NewRecommendationService(openaiService)
-	iRecommendationHandler := handler.NewRecommendationHandler(iRecommendationService)
+	iRecommendationOrchestrator := orchestration.NewRecommendationOrchestrator(iRecommendationService)
+	iRecommendationHandler := handler.NewRecommendationHandler(iRecommendationOrchestrator)
 	iRoute := internal.NewRoute(iRecommendationHandler)
 	return iRoute
 }
 
 // wire.go:
 
-var recoSet = wire.NewSet(service.NewRecommendationService, handler.NewRecommendationHandler)
+var recoSet = wire.NewSet(service.NewRecommendationService, orchestration.NewRecommendationOrchestrator, handler.NewRecommendationHandler)

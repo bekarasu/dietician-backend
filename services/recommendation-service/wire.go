@@ -10,11 +10,13 @@ import (
 	"dietician.local/services/recommendation-service/config"
 	"dietician.local/services/recommendation-service/internal"
 	"dietician.local/services/recommendation-service/internal/recommendation/handler"
+	"dietician.local/services/recommendation-service/internal/recommendation/orchestration"
 	"dietician.local/services/recommendation-service/internal/recommendation/service"
 )
 
 var recoSet = wire.NewSet(
 	service.NewRecommendationService,
+	orchestration.NewRecommendationOrchestrator,
 	handler.NewRecommendationHandler,
 )
 

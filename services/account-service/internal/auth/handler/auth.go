@@ -7,7 +7,7 @@ import (
 	pkgresponse "dietician.local/packages/response"
 	"dietician.local/packages/validation"
 	"dietician.local/services/account-service/internal/auth/model"
-	"dietician.local/services/account-service/internal/auth/service"
+	"dietician.local/services/account-service/internal/auth/orchestration"
 	"dietician.local/services/account-service/internal/auth/dto/request"
 	"dietician.local/services/account-service/internal/auth/dto/response"
 )
@@ -21,11 +21,11 @@ type IAuthHandler interface {
 }
 
 type AuthHandler struct {
-	authService service.IUserService
+	authOrchestrator orchestration.IAuthOrchestrator
 }
 
-func NewAuthHandler(authService service.IUserService) IAuthHandler {
-	return &AuthHandler{authService: authService}
+func NewAuthHandler(authOrchestrator orchestration.IAuthOrchestrator) IAuthHandler {
+	return &AuthHandler{authOrchestrator: authOrchestrator}
 }
 
 // Register creates a new user account and sends an OTP.
@@ -55,7 +55,7 @@ func (h *AuthHandler) Register(c *fiber.Ctx) error {
 		LastName:  req.LastName,
 	}
 
-	resp, err := h.authService.Register(c.UserContext(), svcReq)
+	resp, err := h.authOrchestrator.Register(c.UserContext(), svcReq)
 	if err != nil {
 		return pkgresponse.Error(c, fiber.StatusBadRequest, err.Error())
 	}
@@ -92,7 +92,7 @@ func (h *AuthHandler) VerifyOTP(c *fiber.Ctx) error {
 		OTP:      req.OTP,
 	}
 
-	resp, err := h.authService.VerifyOTP(c.UserContext(), svcReq)
+	resp, err := h.authOrchestrator.VerifyOTP(c.UserContext(), svcReq)
 	if err != nil {
 		return pkgresponse.Error(c, fiber.StatusBadRequest, err.Error())
 	}
@@ -131,7 +131,7 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 		Password: req.Password,
 	}
 
-	resp, err := h.authService.Login(c.UserContext(), svcReq)
+	resp, err := h.authOrchestrator.Login(c.UserContext(), svcReq)
 	if err != nil {
 		return pkgresponse.Error(c, fiber.StatusUnauthorized, err.Error())
 	}
@@ -169,7 +169,7 @@ func (h *AuthHandler) Refresh(c *fiber.Ctx) error {
 		RefreshToken: req.RefreshToken,
 	}
 
-	resp, err := h.authService.Refresh(c.UserContext(), svcReq)
+	resp, err := h.authOrchestrator.Refresh(c.UserContext(), svcReq)
 	if err != nil {
 		return pkgresponse.Error(c, fiber.StatusUnauthorized, err.Error())
 	}
@@ -200,7 +200,7 @@ func (h *AuthHandler) Logout(c *fiber.Ctx) error {
 
 	token := middleware.ExtractBearerToken(c)
 
-	err := h.authService.Logout(c.UserContext(), userID, token)
+	err := h.authOrchestrator.Logout(c.UserContext(), userID, token)
 	if err != nil {
 		return pkgresponse.Error(c, fiber.StatusInternalServerError, err.Error())
 	}

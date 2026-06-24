@@ -6,7 +6,7 @@ import (
 	"dietician.local/packages/response"
 	requestdto "dietician.local/services/progress-service/internal/progress/dto/request"
 	_ "dietician.local/services/progress-service/internal/progress/dto/response"
-	"dietician.local/services/progress-service/internal/progress/service"
+	"dietician.local/services/progress-service/internal/progress/orchestration"
 )
 
 type IProgressHandler interface {
@@ -17,12 +17,12 @@ type IProgressHandler interface {
 }
 
 type progressHandler struct {
-	progressService service.IProgressService
+	progressOrchestrator orchestration.IProgressOrchestrator
 }
 
-func NewProgressHandler(progressService service.IProgressService) IProgressHandler {
+func NewProgressHandler(progressOrchestrator orchestration.IProgressOrchestrator) IProgressHandler {
 	return &progressHandler{
-		progressService: progressService,
+		progressOrchestrator: progressOrchestrator,
 	}
 }
 
@@ -41,7 +41,7 @@ func NewProgressHandler(progressService service.IProgressService) IProgressHandl
 func (h *progressHandler) GetProgress(c *fiber.Ctx) error {
 	userID := c.Params("userId")
 
-	progress, err := h.progressService.GetProgress(c.Context(), userID)
+	progress, err := h.progressOrchestrator.GetProgress(c.Context(), userID)
 	if err != nil {
 		return response.Error(c, fiber.StatusInternalServerError, "failed to get progress")
 	}
@@ -70,7 +70,7 @@ func (h *progressHandler) AddWeight(c *fiber.Ctx) error {
 		return response.Error(c, fiber.StatusBadRequest, "invalid request body")
 	}
 
-	log, err := h.progressService.AddWeight(c.Context(), userID, req)
+	log, err := h.progressOrchestrator.AddWeight(c.Context(), userID, req)
 	if err != nil {
 		return response.Error(c, fiber.StatusBadRequest, err.Error())
 	}
@@ -92,7 +92,7 @@ func (h *progressHandler) AddWeight(c *fiber.Ctx) error {
 func (h *progressHandler) GetWeeklySummary(c *fiber.Ctx) error {
 	userID := c.Params("userId")
 
-	summary, err := h.progressService.GetWeeklySummary(c.Context(), userID)
+	summary, err := h.progressOrchestrator.GetWeeklySummary(c.Context(), userID)
 	if err != nil {
 		return response.Error(c, fiber.StatusInternalServerError, "failed to get weekly summary")
 	}
@@ -121,7 +121,7 @@ func (h *progressHandler) AddHabit(c *fiber.Ctx) error {
 		return response.Error(c, fiber.StatusBadRequest, "invalid request body")
 	}
 
-	log, err := h.progressService.AddHabit(c.Context(), userID, req)
+	log, err := h.progressOrchestrator.AddHabit(c.Context(), userID, req)
 	if err != nil {
 		return response.Error(c, fiber.StatusBadRequest, err.Error())
 	}

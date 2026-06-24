@@ -9,6 +9,7 @@ import (
 
 	"dietician.local/services/progress-service/internal"
 	"dietician.local/services/progress-service/internal/progress/handler"
+	"dietician.local/services/progress-service/internal/progress/orchestration"
 	"dietician.local/services/progress-service/internal/progress/repository"
 	"dietician.local/services/progress-service/internal/progress/service"
 )
@@ -16,6 +17,7 @@ import (
 var progressSet = wire.NewSet(
 	repository.NewProgressRepository,
 	service.NewProgressService,
+	orchestration.NewProgressOrchestrator,
 	handler.NewProgressHandler,
 )
 

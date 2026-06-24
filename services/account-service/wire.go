@@ -14,9 +14,11 @@ import (
 	authrepository "dietician.local/services/account-service/internal/auth/repository"
 	authservice "dietician.local/services/account-service/internal/auth/service"
 	authhandler "dietician.local/services/account-service/internal/auth/handler"
+	authorchestrator "dietician.local/services/account-service/internal/auth/orchestration"
 	profilehandler "dietician.local/services/account-service/internal/profile/handler"
 	profilerepository "dietician.local/services/account-service/internal/profile/repository"
 	profileservice "dietician.local/services/account-service/internal/profile/service"
+	profileorchestrator "dietician.local/services/account-service/internal/profile/orchestration"
 )
 
 // authSet wires authentication dependencies
@@ -27,6 +29,7 @@ var authSet = wire.NewSet(
 	authservice.NewOTPService,
 	authservice.NewRefreshTokenService,
 	authservice.NewUserService,
+	authorchestrator.NewAuthOrchestrator,
 	authhandler.NewAuthHandler,
 )
 
@@ -34,6 +37,7 @@ var authSet = wire.NewSet(
 var profileSet = wire.NewSet(
 	profilerepository.NewProfileRepository,
 	profileservice.NewProfileService,
+	profileorchestrator.NewProfileOrchestrator,
 	profilehandler.NewProfileHandler,
 )
 
