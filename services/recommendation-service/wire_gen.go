@@ -10,22 +10,33 @@ import (
 	"dietician.local/packages/openai"
 	"dietician.local/services/recommendation-service/config"
 	"dietician.local/services/recommendation-service/internal"
+	handler2 "dietician.local/services/recommendation-service/internal/dietplan/handler"
+	orchestration2 "dietician.local/services/recommendation-service/internal/dietplan/orchestration"
+	"dietician.local/services/recommendation-service/internal/dietplan/repository"
+	service2 "dietician.local/services/recommendation-service/internal/dietplan/service"
 	"dietician.local/services/recommendation-service/internal/recommendation/handler"
 	"dietician.local/services/recommendation-service/internal/recommendation/orchestration"
 	"dietician.local/services/recommendation-service/internal/recommendation/service"
 	"github.com/google/wire"
+	"github.com/jmoiron/sqlx"
 )
 
 // Injectors from wire.go:
 
-func InitRoute(cfg *config.RecommendationAppScheme, openaiService openai.Service) internal.IRoute {
+func InitRoute(cfg *config.RecommendationAppScheme, openaiService openai.Service, db *sqlx.DB) internal.IRoute {
 	iRecommendationService := service.NewRecommendationService(openaiService)
 	iRecommendationOrchestrator := orchestration.NewRecommendationOrchestrator(iRecommendationService)
 	iRecommendationHandler := handler.NewRecommendationHandler(iRecommendationOrchestrator)
-	iRoute := internal.NewRoute(iRecommendationHandler)
+	iDietPlanRepository := repository.NewDietPlanRepository(db)
+	iDietPlanService := service2.NewDietPlanService(iDietPlanRepository)
+	iDietPlanOrchestrator := orchestration2.NewDietPlanOrchestrator(iDietPlanService)
+	iDietPlanHandler := handler2.NewDietPlanHandler(iDietPlanOrchestrator)
+	iRoute := internal.NewRoute(iRecommendationHandler, iDietPlanHandler)
 	return iRoute
 }
 
 // wire.go:
 
 var recoSet = wire.NewSet(service.NewRecommendationService, orchestration.NewRecommendationOrchestrator, handler.NewRecommendationHandler)
+
+var dietplanSet = wire.NewSet(repository.NewDietPlanRepository, service2.NewDietPlanService, orchestration2.NewDietPlanOrchestrator, handler2.NewDietPlanHandler)

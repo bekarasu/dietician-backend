@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/jmoiron/sqlx"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"github.com/sirupsen/logrus"
 
@@ -22,6 +23,7 @@ type application struct {
 	cfg            *config.RecommendationAppScheme
 	languageBundle *i18n.Bundle
 	openaiService  openai.Service
+	db             *sqlx.DB
 }
 
 type Server struct {
@@ -42,7 +44,7 @@ func initApplication(a *application) *Server {
 	srv.addHealthCheckRoutes()
 	srv.addCommonMiddleware()
 
-	route := recoservice.InitRoute(a.cfg, a.openaiService)
+	route := recoservice.InitRoute(a.cfg, a.openaiService, a.db)
 	route.SetupRoutes(&internal.RouteContext{App: srv.srv})
 
 	// Setup Swagger UI

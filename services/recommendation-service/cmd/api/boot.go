@@ -1,9 +1,15 @@
 package main
 
 import (
+	"fmt"
+	"time"
+
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/text/language"
+
+	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
 
 	"dietician.local/packages/localizer"
 	"dietician.local/packages/logging"
@@ -12,6 +18,11 @@ import (
 )
 
 func boot(logger *logrus.Logger, cfg *config.RecommendationAppScheme) (*application, error) {
+	db, err := initPostgres(cfg, logger)
+	if err != nil {
+		return nil, fmt.Errorf("postgres initialization: %v", err)
+	}
+
 	bundle := initLocalizer(cfg)
 
 	openAIService := openai.NewService(openai.Config{
@@ -23,6 +34,7 @@ func boot(logger *logrus.Logger, cfg *config.RecommendationAppScheme) (*applicat
 		cfg:            cfg,
 		languageBundle: bundle,
 		openaiService:  openAIService,
+		db:             db,
 	}, nil
 }
 
@@ -47,4 +59,16 @@ func initLocalizer(cfg *config.RecommendationAppScheme) *i18n.Bundle {
 			language.Turkish,
 		},
 	})
+}
+
+func initPostgres(cfg *config.RecommendationAppScheme, logger *logrus.Logger) (*sqlx.DB, error) {
+	db, err := sqlx.Connect("postgres", cfg.Postgres.DSN())
+	if err != nil {
+		return nil, fmt.Errorf("postgres connect: %w", err)
+	}
+	db.SetMaxOpenConns(25)
+	db.SetMaxIdleConns(5)
+	db.SetConnMaxLifetime(5 * time.Minute)
+	logger.Info("connected to postgres")
+	return db, nil
 }

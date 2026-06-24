@@ -8,10 +8,18 @@ package progressservice
 
 import (
 	"dietician.local/services/progress-service/internal"
+	handler2 "dietician.local/services/progress-service/internal/dailylog/handler"
+	orchestration2 "dietician.local/services/progress-service/internal/dailylog/orchestration"
+	repository2 "dietician.local/services/progress-service/internal/dailylog/repository"
+	"dietician.local/services/progress-service/internal/dailylog/service"
 	"dietician.local/services/progress-service/internal/progress/handler"
 	"dietician.local/services/progress-service/internal/progress/orchestration"
 	"dietician.local/services/progress-service/internal/progress/repository"
-	"dietician.local/services/progress-service/internal/progress/service"
+	service3 "dietician.local/services/progress-service/internal/progress/service"
+	handler3 "dietician.local/services/progress-service/internal/tracking/handler"
+	orchestration3 "dietician.local/services/progress-service/internal/tracking/orchestration"
+	repository3 "dietician.local/services/progress-service/internal/tracking/repository"
+	service2 "dietician.local/services/progress-service/internal/tracking/service"
 	"github.com/google/wire"
 	"github.com/jmoiron/sqlx"
 )
@@ -20,13 +28,25 @@ import (
 
 func InitRoute(db *sqlx.DB) internal.IRoute {
 	iProgressRepository := repository.NewProgressRepository(db)
-	iProgressService := service.NewProgressService(iProgressRepository)
+	iDailyLogRepository := repository2.NewDailyLogRepository(db)
+	iDailyLogService := service.NewDailyLogService(iDailyLogRepository)
+	iTrackingRepository := repository3.NewTrackingRepository(db)
+	iTrackingService := service2.NewTrackingService(iTrackingRepository)
+	iProgressService := service3.NewProgressService(iProgressRepository, iDailyLogService, iTrackingService)
 	iProgressOrchestrator := orchestration.NewProgressOrchestrator(iProgressService)
 	iProgressHandler := handler.NewProgressHandler(iProgressOrchestrator)
-	iRoute := internal.NewRoute(iProgressHandler)
+	iDailyLogOrchestrator := orchestration2.NewDailyLogOrchestrator(iDailyLogService)
+	iDailyLogHandler := handler2.NewDailyLogHandler(iDailyLogOrchestrator)
+	iTrackingOrchestrator := orchestration3.NewTrackingOrchestrator(iTrackingService)
+	iTrackingHandler := handler3.NewTrackingHandler(iTrackingOrchestrator)
+	iRoute := internal.NewRoute(iProgressHandler, iDailyLogHandler, iTrackingHandler)
 	return iRoute
 }
 
 // wire.go:
 
-var progressSet = wire.NewSet(repository.NewProgressRepository, service.NewProgressService, orchestration.NewProgressOrchestrator, handler.NewProgressHandler)
+var progressSet = wire.NewSet(repository.NewProgressRepository, service3.NewProgressService, orchestration.NewProgressOrchestrator, handler.NewProgressHandler)
+
+var dailylogSet = wire.NewSet(repository2.NewDailyLogRepository, service.NewDailyLogService, orchestration2.NewDailyLogOrchestrator, handler2.NewDailyLogHandler)
+
+var trackingSet = wire.NewSet(repository3.NewTrackingRepository, service2.NewTrackingService, orchestration3.NewTrackingOrchestrator, handler3.NewTrackingHandler)

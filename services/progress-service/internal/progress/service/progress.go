@@ -7,6 +7,9 @@ import (
 	"dietician.local/services/progress-service/internal/progress/dto/request"
 	"dietician.local/services/progress-service/internal/progress/dto/response"
 	"dietician.local/services/progress-service/internal/progress/repository"
+	
+	dailylog_service "dietician.local/services/progress-service/internal/dailylog/service"
+	tracking_service "dietician.local/services/progress-service/internal/tracking/service"
 )
 
 type IProgressService interface {
@@ -17,11 +20,17 @@ type IProgressService interface {
 }
 
 type progressService struct {
-	repo repository.IProgressRepository
+	repo         repository.IProgressRepository
+	dlService    dailylog_service.IDailyLogService
+	trackService tracking_service.ITrackingService
 }
 
-func NewProgressService(repo repository.IProgressRepository) IProgressService {
-	return &progressService{repo: repo}
+func NewProgressService(repo repository.IProgressRepository, dlService dailylog_service.IDailyLogService, trackService tracking_service.ITrackingService) IProgressService {
+	return &progressService{
+		repo:         repo,
+		dlService:    dlService,
+		trackService: trackService,
+	}
 }
 
 func (s *progressService) GetProgress(ctx context.Context, userID string) (*response.ProgressResponse, error) {
@@ -41,9 +50,21 @@ func (s *progressService) GetProgress(ctx context.Context, userID string) (*resp
 		habits = []repository.HabitLog{}
 	}
 
+	dailyLogs, err := s.dlService.GetDailyLogs(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	
+	trackingMetrics, err := s.trackService.GetTrackingMetrics(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
 	return &response.ProgressResponse{
-		WeightLogs: weights,
-		HabitLogs:  habits,
+		WeightLogs:      weights,
+		HabitLogs:       habits,
+		DailyLogs:       dailyLogs,
+		TrackingMetrics: trackingMetrics,
 	}, nil
 }
 

@@ -6,6 +6,8 @@ require (
 	dietician.local/packages v0.0.0
 	github.com/gofiber/fiber/v2 v2.52.13
 	github.com/google/wire v0.7.0
+	github.com/jmoiron/sqlx v1.4.0
+	github.com/lib/pq v1.10.9
 	github.com/nicksnyder/go-i18n/v2 v2.6.1
 	github.com/sirupsen/logrus v1.9.4
 	github.com/spf13/viper v1.21.0
