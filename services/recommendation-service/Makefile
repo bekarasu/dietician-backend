@@ -11,4 +11,4 @@ run:
 	go run cmd/api/*.go
 
 swag:
-	swag init -g cmd/api/main.go
+	swag init -g cmd/api/main.go --parseDependency --parseInternal
