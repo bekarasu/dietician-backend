@@ -1,4 +1,208 @@
 basePath: /
+definitions:
+  dto.CreateDietPlanMealDto:
+    properties:
+      calories:
+        type: integer
+      carbs_g:
+        type: number
+      day_of_week:
+        type: integer
+      description:
+        type: string
+      fat_g:
+        type: number
+      meal_type:
+        type: string
+      name:
+        type: string
+      protein_g:
+        type: number
+      recipe_id:
+        type: string
+    required:
+    - meal_type
+    - name
+    type: object
+  dto.CreateDietPlanRequest:
+    properties:
+      end_date:
+        type: string
+      goals:
+        type: string
+      meals:
+        items:
+          $ref: '#/definitions/dto.CreateDietPlanMealDto'
+        minItems: 1
+        type: array
+      start_date:
+        type: string
+      user_id:
+        type: string
+    required:
+    - meals
+    - start_date
+    - user_id
+    type: object
+  dto.DietPlanMealResponse:
+    properties:
+      calories:
+        type: integer
+      carbs_g:
+        type: number
+      day_of_week:
+        type: integer
+      description:
+        type: string
+      fat_g:
+        type: number
+      id:
+        type: string
+      meal_type:
+        type: string
+      name:
+        type: string
+      protein_g:
+        type: number
+      recipe_id:
+        type: string
+    type: object
+  dto.DietPlanResponse:
+    properties:
+      end_date:
+        type: string
+      goals:
+        type: string
+      id:
+        type: string
+      meals:
+        items:
+          $ref: '#/definitions/dto.DietPlanMealResponse'
+        type: array
+      start_date:
+        type: string
+      status:
+        type: string
+      user_id:
+        type: string
+    type: object
+  openai.DailyPlan:
+    properties:
+      breakfast:
+        $ref: '#/definitions/openai.Meal'
+      day:
+        minimum: 1
+        type: integer
+      dinner:
+        $ref: '#/definitions/openai.Meal'
+      lunch:
+        $ref: '#/definitions/openai.Meal'
+      snacks:
+        items:
+          $ref: '#/definitions/openai.Meal'
+        type: array
+      totalCalories:
+        type: integer
+    required:
+    - breakfast
+    - day
+    - dinner
+    - lunch
+    - totalCalories
+    type: object
+  openai.DietRecommendationRequestDto:
+    properties:
+      activityLevel:
+        description: e.g. sedentary, light, moderate, active, very active
+        type: string
+      age:
+        minimum: 1
+        type: integer
+      allergies:
+        items:
+          type: string
+        type: array
+      dietaryPreferences:
+        description: e.g. vegan, keto
+        items:
+          type: string
+        type: array
+      durationDays:
+        maximum: 7
+        minimum: 1
+        type: integer
+      gender:
+        type: string
+      goal:
+        description: e.g. weight_loss, muscle_gain, maintenance
+        type: string
+      heightCm:
+        minimum: 50
+        type: number
+      weightKg:
+        minimum: 20
+        type: number
+    required:
+    - activityLevel
+    - age
+    - durationDays
+    - gender
+    - goal
+    - heightCm
+    - weightKg
+    type: object
+  openai.DietRecommendationResponse:
+    properties:
+      dailyPlans:
+        items:
+          $ref: '#/definitions/openai.DailyPlan'
+        minItems: 1
+        type: array
+      summary:
+        type: string
+    required:
+    - dailyPlans
+    - summary
+    type: object
+  openai.Meal:
+    properties:
+      calories:
+        type: integer
+      carbs:
+        type: integer
+      description:
+        type: string
+      fats:
+        type: integer
+      name:
+        type: string
+      protein:
+        type: integer
+    required:
+    - calories
+    - carbs
+    - description
+    - fats
+    - name
+    - protein
+    type: object
+  response.ErrorResponse:
+    properties:
+      code:
+        type: integer
+      error:
+        type: string
+      message:
+        type: string
+      request_id:
+        type: string
+    type: object
+  response.SuccessResponse:
+    properties:
+      data: {}
+      message:
+        type: string
+    type: object
 host: localhost:8081
 info:
   contact:
@@ -11,7 +215,81 @@ info:
   termsOfService: http://swagger.io/terms/
   title: Recommendation Service API
   version: "1.0"
-paths: {}
+paths:
+  /api/v1/diet-plans:
+    post:
+      consumes:
+      - application/json
+      description: Create a new diet plan based on given parameters
+      parameters:
+      - description: Diet Plan Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateDietPlanRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.DietPlanResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create Diet Plan
+      tags:
+      - Diet Plans
+  /api/v1/recommendations:
+    post:
+      consumes:
+      - application/json
+      description: Generate a list of diet recommendations using OpenAI
+      parameters:
+      - description: Recommendation Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/openai.DietRecommendationRequestDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/openai.DietRecommendationResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create Diet Recommendations
+      tags:
+      - Recommendations
 securityDefinitions:
   BearerAuth:
     in: header

@@ -12,7 +12,7 @@ definitions:
         type: string
       storageKey:
         type: string
-      uploadId:
+      uploadID:
         type: string
     type: object
   repository.MedicalUpload:
@@ -27,7 +27,7 @@ definitions:
         type: string
       uploadType:
         type: string
-      userId:
+      userID:
         type: string
     type: object
   response.ErrorResponse:
@@ -106,15 +106,6 @@ paths:
         in: formData
         name: uploadType
         required: true
-        type: string
-      - description: Title
-        in: formData
-        name: title
-        required: true
-        type: string
-      - description: Description
-        in: formData
-        name: description
         type: string
       - description: File to upload
         in: formData

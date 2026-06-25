@@ -16,7 +16,430 @@
     },
     "host": "localhost:8081",
     "basePath": "/",
-    "paths": {},
+    "paths": {
+        "/api/v1/diet-plans": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Create a new diet plan based on given parameters",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Diet Plans"
+                ],
+                "summary": "Create Diet Plan",
+                "parameters": [
+                    {
+                        "description": "Diet Plan Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.CreateDietPlanRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.DietPlanResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/recommendations": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Generate a list of diet recommendations using OpenAI",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Recommendations"
+                ],
+                "summary": "Create Diet Recommendations",
+                "parameters": [
+                    {
+                        "description": "Recommendation Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/openai.DietRecommendationRequestDto"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/openai.DietRecommendationResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "dto.CreateDietPlanMealDto": {
+            "type": "object",
+            "required": [
+                "meal_type",
+                "name"
+            ],
+            "properties": {
+                "calories": {
+                    "type": "integer"
+                },
+                "carbs_g": {
+                    "type": "number"
+                },
+                "day_of_week": {
+                    "type": "integer"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "fat_g": {
+                    "type": "number"
+                },
+                "meal_type": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "protein_g": {
+                    "type": "number"
+                },
+                "recipe_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.CreateDietPlanRequest": {
+            "type": "object",
+            "required": [
+                "meals",
+                "start_date",
+                "user_id"
+            ],
+            "properties": {
+                "end_date": {
+                    "type": "string"
+                },
+                "goals": {
+                    "type": "string"
+                },
+                "meals": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "$ref": "#/definitions/dto.CreateDietPlanMealDto"
+                    }
+                },
+                "start_date": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.DietPlanMealResponse": {
+            "type": "object",
+            "properties": {
+                "calories": {
+                    "type": "integer"
+                },
+                "carbs_g": {
+                    "type": "number"
+                },
+                "day_of_week": {
+                    "type": "integer"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "fat_g": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "meal_type": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "protein_g": {
+                    "type": "number"
+                },
+                "recipe_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.DietPlanResponse": {
+            "type": "object",
+            "properties": {
+                "end_date": {
+                    "type": "string"
+                },
+                "goals": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "meals": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.DietPlanMealResponse"
+                    }
+                },
+                "start_date": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "openai.DailyPlan": {
+            "type": "object",
+            "required": [
+                "breakfast",
+                "day",
+                "dinner",
+                "lunch",
+                "totalCalories"
+            ],
+            "properties": {
+                "breakfast": {
+                    "$ref": "#/definitions/openai.Meal"
+                },
+                "day": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "dinner": {
+                    "$ref": "#/definitions/openai.Meal"
+                },
+                "lunch": {
+                    "$ref": "#/definitions/openai.Meal"
+                },
+                "snacks": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/openai.Meal"
+                    }
+                },
+                "totalCalories": {
+                    "type": "integer"
+                }
+            }
+        },
+        "openai.DietRecommendationRequestDto": {
+            "type": "object",
+            "required": [
+                "activityLevel",
+                "age",
+                "durationDays",
+                "gender",
+                "goal",
+                "heightCm",
+                "weightKg"
+            ],
+            "properties": {
+                "activityLevel": {
+                    "description": "e.g. sedentary, light, moderate, active, very active",
+                    "type": "string"
+                },
+                "age": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "allergies": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "dietaryPreferences": {
+                    "description": "e.g. vegan, keto",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "durationDays": {
+                    "type": "integer",
+                    "maximum": 7,
+                    "minimum": 1
+                },
+                "gender": {
+                    "type": "string"
+                },
+                "goal": {
+                    "description": "e.g. weight_loss, muscle_gain, maintenance",
+                    "type": "string"
+                },
+                "heightCm": {
+                    "type": "number",
+                    "minimum": 50
+                },
+                "weightKg": {
+                    "type": "number",
+                    "minimum": 20
+                }
+            }
+        },
+        "openai.DietRecommendationResponse": {
+            "type": "object",
+            "required": [
+                "dailyPlans",
+                "summary"
+            ],
+            "properties": {
+                "dailyPlans": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "$ref": "#/definitions/openai.DailyPlan"
+                    }
+                },
+                "summary": {
+                    "type": "string"
+                }
+            }
+        },
+        "openai.Meal": {
+            "type": "object",
+            "required": [
+                "calories",
+                "carbs",
+                "description",
+                "fats",
+                "name",
+                "protein"
+            ],
+            "properties": {
+                "calories": {
+                    "type": "integer"
+                },
+                "carbs": {
+                    "type": "integer"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "fats": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "protein": {
+                    "type": "integer"
+                }
+            }
+        },
+        "response.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "error": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "request_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.SuccessResponse": {
+            "type": "object",
+            "properties": {
+                "data": {},
+                "message": {
+                    "type": "string"
+                }
+            }
+        }
+    },
     "securityDefinitions": {
         "BearerAuth": {
             "type": "apiKey",

@@ -97,19 +97,6 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "type": "string",
-                        "description": "Title",
-                        "name": "title",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Description",
-                        "name": "description",
-                        "in": "formData"
-                    },
-                    {
                         "type": "file",
                         "description": "File to upload",
                         "name": "file",
@@ -279,7 +266,7 @@ const docTemplate = `{
                 "storageKey": {
                     "type": "string"
                 },
-                "uploadId": {
+                "uploadID": {
                     "type": "string"
                 }
             }
@@ -302,7 +289,7 @@ const docTemplate = `{
                 "uploadType": {
                     "type": "string"
                 },
-                "userId": {
+                "userID": {
                     "type": "string"
                 }
             }

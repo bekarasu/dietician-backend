@@ -22,6 +22,17 @@ func NewRecommendationHandler(recoOrchestrator orchestration.IRecommendationOrch
 	}
 }
 
+// @Summary Create Diet Recommendations
+// @Description Generate a list of diet recommendations using OpenAI
+// @Tags Recommendations
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body openai.DietRecommendationRequestDto true "Recommendation Request"
+// @Success 200 {object} response.SuccessResponse{data=openai.DietRecommendationResponse} "OK"
+// @Failure 400 {object} response.ErrorResponse "Bad Request"
+// @Failure 500 {object} response.ErrorResponse "Internal Server Error"
+// @Router /api/v1/recommendations [post]
 func (h *recommendationHandler) CreateDietRecommendations(c *fiber.Ctx) error {
 	var req openai.DietRecommendationRequestDto
 

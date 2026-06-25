@@ -22,6 +22,17 @@ func NewDietPlanHandler(orchestrator orchestration.IDietPlanOrchestrator) IDietP
 	}
 }
 
+// @Summary Create Diet Plan
+// @Description Create a new diet plan based on given parameters
+// @Tags Diet Plans
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body dto.CreateDietPlanRequest true "Diet Plan Request"
+// @Success 200 {object} response.SuccessResponse{data=dto.DietPlanResponse} "OK"
+// @Failure 400 {object} response.ErrorResponse "Bad Request"
+// @Failure 500 {object} response.ErrorResponse "Internal Server Error"
+// @Router /api/v1/diet-plans [post]
 func (h *dietPlanHandler) CreateDietPlan(c *fiber.Ctx) error {
 	var req dto.CreateDietPlanRequest
 

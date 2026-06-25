@@ -35,8 +35,6 @@ func NewMedicalHandler(medOrchestrator orchestration.IMedicalOrchestrator) IMedi
 // @Produce json
 // @Security BearerAuth
 // @Param uploadType formData string true "Upload Type"
-// @Param title formData string true "Title"
-// @Param description formData string false "Description"
 // @Param file formData file true "File to upload"
 // @Success 200 {object} response.SuccessResponse{data=repository.MedicalUpload}
 // @Failure 400 {object} response.ErrorResponse

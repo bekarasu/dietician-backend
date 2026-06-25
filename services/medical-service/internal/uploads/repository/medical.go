@@ -7,21 +7,21 @@ import (
 )
 
 type MedicalUpload struct {
-	ID          string `db:"id" json:"id"`
-	UserID      string `db:"user_id" json:"userId"`
-	UploadType  string `db:"upload_type" json:"uploadType"`
-	Title       string `db:"title" json:"title"`
-	Description string `db:"description" json:"description"`
-	Status      string `db:"status" json:"status"`
+	ID          string `db:"id"`
+	UserID      string `db:"user_id"`
+	UploadType  string `db:"upload_type"`
+	Title       string `db:"title"`
+	Description string `db:"description"`
+	Status      string `db:"status"`
 }
 
 type MedicalFileMetadata struct {
-	ID          string `db:"id" json:"id"`
-	UploadID    string `db:"upload_id" json:"uploadId"`
-	FileName    string `db:"file_name" json:"fileName"`
-	FileSize    int64  `db:"file_size" json:"fileSize"`
-	ContentType string `db:"content_type" json:"contentType"`
-	StorageKey  string `db:"storage_key" json:"storageKey"`
+	ID          string `db:"id"`
+	UploadID    string `db:"upload_id"`
+	FileName    string `db:"file_name"`
+	FileSize    int64  `db:"file_size"`
+	ContentType string `db:"content_type"`
+	StorageKey  string `db:"storage_key"`
 }
 
 type IMedicalRepository interface {
@@ -29,7 +29,6 @@ type IMedicalRepository interface {
 	GetUploadsByUserID(ctx context.Context, userID string) ([]MedicalUpload, error)
 	GetUploadByID(ctx context.Context, uploadID string) (*MedicalUpload, error)
 	DeleteUpload(ctx context.Context, uploadID string) error
-
 	CreateFileMetadata(ctx context.Context, meta *MedicalFileMetadata) error
 	GetFileMetadataByUploadID(ctx context.Context, uploadID string) ([]MedicalFileMetadata, error)
 }

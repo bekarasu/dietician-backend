@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"dietician.local/services/medical-service/internal/storage"
 	"dietician.local/services/medical-service/internal/uploads/dto/request"
@@ -35,9 +36,9 @@ func NewMedicalService(repo repository.IMedicalRepository, provider storage.Prov
 func (s *medicalService) CreateUpload(ctx context.Context, userID string, req request.CreateUploadRequest) (*repository.MedicalUpload, error) {
 	upload := &repository.MedicalUpload{
 		UserID:      userID,
-		UploadType:  req.UploadType,
-		Title:       req.Title,
-		Description: req.Description,
+		UploadType:  string(req.UploadType),
+		Title:       fmt.Sprintf("%s-%s", string(req.UploadType), time.Now().Format(time.RFC3339)),
+		Description: string(req.UploadType),
 		Status:      "pending",
 	}
 
