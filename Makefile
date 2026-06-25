@@ -72,6 +72,10 @@ swag:
 		fi \
 	done
 
+postman: swag
+	@echo "=== Converting swagger to Postman collection ==="
+	@node scripts/swag2postman.js
+
 wire:
 	@for d in services/*; do \
 		if [ -f "$$d/Makefile" ]; then \
