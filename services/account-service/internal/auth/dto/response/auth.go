@@ -13,7 +13,7 @@ type User struct {
 }
 
 type RegisterResponse struct {
-	OTPToken string `json:"otp_token"`
+	OTPToken string `json:"otpToken"`
 }
 
 type AuthResponse struct {

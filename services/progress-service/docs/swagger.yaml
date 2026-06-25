@@ -1,5 +1,64 @@
 basePath: /
 definitions:
+  dto.DailyLogMealRes:
+    properties:
+      calories:
+        type: integer
+      carbs_g:
+        type: number
+      fat_g:
+        type: number
+      id:
+        type: string
+      logged_at:
+        type: string
+      meal_type:
+        type: string
+      name:
+        type: string
+      protein_g:
+        type: number
+    type: object
+  dto.DailyLogResponse:
+    properties:
+      exercise_minutes:
+        type: integer
+      id:
+        type: string
+      log_date:
+        type: string
+      meals:
+        items:
+          $ref: '#/definitions/dto.DailyLogMealRes'
+        type: array
+      mood:
+        type: string
+      notes:
+        type: string
+      sleep_hours:
+        type: number
+      user_id:
+        type: string
+      water_intake_ml:
+        type: integer
+    type: object
+  dto.TrackingMetricResponse:
+    properties:
+      current_value:
+        type: number
+      deadline:
+        type: string
+      id:
+        type: string
+      metric_type:
+        type: string
+      status:
+        type: string
+      target_value:
+        type: number
+      user_id:
+        type: string
+    type: object
   repository.HabitLog:
     properties:
       completed:
@@ -86,9 +145,17 @@ definitions:
     type: object
   response.ProgressResponse:
     properties:
+      dailyLogs:
+        items:
+          $ref: '#/definitions/dto.DailyLogResponse'
+        type: array
       habitLogs:
         items:
           $ref: '#/definitions/repository.HabitLog'
+        type: array
+      trackingMetrics:
+        items:
+          $ref: '#/definitions/dto.TrackingMetricResponse'
         type: array
       weightLogs:
         items:
@@ -103,8 +170,14 @@ definitions:
     type: object
 host: localhost:8083
 info:
-  contact: {}
+  contact:
+    email: support@dietician.local
+    name: API Support
   description: This is the progress service for the dietician backend.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
   title: Progress Service API
   version: "1.0"
 paths:

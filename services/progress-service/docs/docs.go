@@ -9,7 +9,15 @@ const docTemplate = `{
     "info": {
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
-        "contact": {},
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {
+            "name": "API Support",
+            "email": "support@dietician.local"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
         "version": "{{.Version}}"
     },
     "host": "{{.Host}}",
@@ -273,6 +281,96 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "dto.DailyLogMealRes": {
+            "type": "object",
+            "properties": {
+                "calories": {
+                    "type": "integer"
+                },
+                "carbs_g": {
+                    "type": "number"
+                },
+                "fat_g": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "logged_at": {
+                    "type": "string"
+                },
+                "meal_type": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "protein_g": {
+                    "type": "number"
+                }
+            }
+        },
+        "dto.DailyLogResponse": {
+            "type": "object",
+            "properties": {
+                "exercise_minutes": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "log_date": {
+                    "type": "string"
+                },
+                "meals": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.DailyLogMealRes"
+                    }
+                },
+                "mood": {
+                    "type": "string"
+                },
+                "notes": {
+                    "type": "string"
+                },
+                "sleep_hours": {
+                    "type": "number"
+                },
+                "user_id": {
+                    "type": "string"
+                },
+                "water_intake_ml": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.TrackingMetricResponse": {
+            "type": "object",
+            "properties": {
+                "current_value": {
+                    "type": "number"
+                },
+                "deadline": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "metric_type": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "target_value": {
+                    "type": "number"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
         "repository.HabitLog": {
             "type": "object",
             "properties": {
@@ -405,10 +503,22 @@ const docTemplate = `{
         "response.ProgressResponse": {
             "type": "object",
             "properties": {
+                "dailyLogs": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.DailyLogResponse"
+                    }
+                },
                 "habitLogs": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/repository.HabitLog"
+                    }
+                },
+                "trackingMetrics": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.TrackingMetricResponse"
                     }
                 },
                 "weightLogs": {

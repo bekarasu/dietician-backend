@@ -17,6 +17,6 @@ type RefreshRequest struct {
 }
 
 type VerifyOTPRequest struct {
-	OTPToken string `json:"otp_token" validate:"required"`
+	OTPToken string `json:"otpToken" validate:"required"`
 	OTP      string `json:"otp" validate:"required,len=6"`
 }

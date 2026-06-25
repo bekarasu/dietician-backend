@@ -9,18 +9,18 @@ definitions:
       fileSize:
         type: integer
       id:
-        type: integer
+        type: string
       storageKey:
         type: string
       uploadId:
-        type: integer
+        type: string
     type: object
   repository.MedicalUpload:
     properties:
       description:
         type: string
       id:
-        type: integer
+        type: string
       status:
         type: string
       title:
@@ -58,8 +58,14 @@ definitions:
     type: object
 host: localhost:8085
 info:
-  contact: {}
+  contact:
+    email: support@dietician.local
+    name: API Support
   description: This is the medical service for the dietician backend.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
   title: Medical Service API
   version: "1.0"
 paths:

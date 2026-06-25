@@ -32,12 +32,12 @@ type RefreshToken struct {
 type RegisterRequest struct {
 	Email     string `json:"email"`
 	Password  string `json:"password"`
-	FirstName string `json:"first_name"`
-	LastName  string `json:"last_name"`
+	FirstName string `json:"firstName"`
+	LastName  string `json:"lastName"`
 }
 
 type Register struct {
-	OTPToken string `json:"otp_token"`
+	OTPToken string `json:"otpToken"`
 }
 
 type LoginRequest struct {
@@ -46,16 +46,16 @@ type LoginRequest struct {
 }
 
 type RefreshRequest struct {
-	RefreshToken string `json:"refresh_token"`
+	RefreshToken string `json:"refreshToken"`
 }
 
 type VerifyOTPRequest struct {
-	OTPToken string `json:"otp_token"`
+	OTPToken string `json:"otpToken"`
 	OTP      string `json:"otp"`
 }
 
 type AuthResponse struct {
-	AccessToken  string `json:"access_token"`
-	RefreshToken string `json:"refresh_token"`
+	AccessToken  string `json:"accessToken"`
+	RefreshToken string `json:"refreshToken"`
 	User         *User  `json:"user"`
 }

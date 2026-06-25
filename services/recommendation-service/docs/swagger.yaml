@@ -1,8 +1,14 @@
 basePath: /
 host: localhost:8081
 info:
-  contact: {}
+  contact:
+    email: support@dietician.local
+    name: API Support
   description: This is the recommendation service for the dietician backend.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
   title: Recommendation Service API
   version: "1.0"
 paths: {}
