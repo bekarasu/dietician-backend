@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 
+	"dietician.local/packages/constants"
+	"dietician.local/packages/utils"
 	"dietician.local/services/account-service/internal/profile/model"
 	"dietician.local/services/account-service/internal/profile/repository"
 )
@@ -22,7 +24,7 @@ func (s *ProfileService) GetProfile(ctx context.Context, userID string) (*model.
 		return nil, err
 	}
 	if profile == nil {
-		return nil, errors.New("profile not found")
+		return nil, errors.New(utils.TranslateByIDWithContext(ctx, constants.ProfileNotFound))
 	}
 	return profile, nil
 }

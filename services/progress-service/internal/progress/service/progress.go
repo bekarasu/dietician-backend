@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 
+	"dietician.local/packages/constants"
+	"dietician.local/packages/utils"
 	"dietician.local/services/progress-service/internal/progress/dto/request"
 	"dietician.local/services/progress-service/internal/progress/dto/response"
 	"dietician.local/services/progress-service/internal/progress/repository"
@@ -70,7 +72,7 @@ func (s *progressService) GetProgress(ctx context.Context, userID string) (*resp
 
 func (s *progressService) AddWeight(ctx context.Context, userID string, req request.AddWeightRequest) (*repository.WeightLog, error) {
 	if req.WeightKg <= 0 {
-		return nil, errors.New("weight must be positive")
+		return nil, errors.New(utils.TranslateByIDWithContext(ctx, constants.WeightMustBePositive))
 	}
 
 	log := &repository.WeightLog{
@@ -90,7 +92,7 @@ func (s *progressService) GetWeeklySummary(ctx context.Context, userID string) (
 
 func (s *progressService) AddHabit(ctx context.Context, userID string, req request.AddHabitRequest) (*repository.HabitLog, error) {
 	if req.HabitName == "" {
-		return nil, errors.New("habit name is required")
+		return nil, errors.New(utils.TranslateByIDWithContext(ctx, constants.HabitNameRequired))
 	}
 
 	log := &repository.HabitLog{

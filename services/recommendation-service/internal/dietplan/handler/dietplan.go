@@ -3,7 +3,9 @@ package handler
 import (
 	"github.com/gofiber/fiber/v2"
 
+	"dietician.local/packages/constants"
 	"dietician.local/packages/response"
+	"dietician.local/packages/utils"
 	"dietician.local/services/recommendation-service/internal/dietplan/dto"
 	"dietician.local/services/recommendation-service/internal/dietplan/orchestration"
 )
@@ -37,12 +39,12 @@ func (h *dietPlanHandler) CreateDietPlan(c *fiber.Ctx) error {
 	var req dto.CreateDietPlanRequest
 
 	if err := c.BodyParser(&req); err != nil {
-		return response.Error(c, fiber.StatusBadRequest, "invalid request body")
+		return response.Error(c, fiber.StatusBadRequest, utils.TranslateByIDWithContext(c.UserContext(), constants.InvalidRequestBody))
 	}
 
 	res, err := h.orchestrator.CreateDietPlan(c.Context(), req)
 	if err != nil {
-		return response.Error(c, fiber.StatusInternalServerError, "failed to create diet plan")
+		return response.Error(c, fiber.StatusInternalServerError, utils.TranslateByIDWithContext(c.UserContext(), constants.FailedToCreateDietPlan))
 	}
 
 	return response.Success(c, "diet plan created successfully", res)

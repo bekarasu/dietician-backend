@@ -3,8 +3,10 @@ package handler
 import (
 	"github.com/gofiber/fiber/v2"
 
+	"dietician.local/packages/constants"
 	"dietician.local/packages/openai"
 	"dietician.local/packages/response"
+	"dietician.local/packages/utils"
 	"dietician.local/services/recommendation-service/internal/recommendation/orchestration"
 )
 
@@ -37,12 +39,12 @@ func (h *recommendationHandler) CreateDietRecommendations(c *fiber.Ctx) error {
 	var req openai.DietRecommendationRequestDto
 
 	if err := c.BodyParser(&req); err != nil {
-		return response.Error(c, fiber.StatusBadRequest, "invalid request body")
+		return response.Error(c, fiber.StatusBadRequest, utils.TranslateByIDWithContext(c.UserContext(), constants.InvalidRequestBody))
 	}
 
 	res, err := h.recoOrchestrator.CreateDietRecommendations(c.Context(), req)
 	if err != nil {
-		return response.Error(c, fiber.StatusInternalServerError, "failed to generate recommendations")
+		return response.Error(c, fiber.StatusInternalServerError, utils.TranslateByIDWithContext(c.UserContext(), constants.FailedToGenerateRecommendations))
 	}
 
 	return response.Success(c, "recommendations generated successfully", res)

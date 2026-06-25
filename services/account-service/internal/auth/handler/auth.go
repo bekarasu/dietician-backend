@@ -3,13 +3,15 @@ package handler
 import (
 	"github.com/gofiber/fiber/v2"
 
+	"dietician.local/packages/constants"
 	"dietician.local/packages/middleware"
 	pkgresponse "dietician.local/packages/response"
+	"dietician.local/packages/utils"
 	"dietician.local/packages/validation"
-	"dietician.local/services/account-service/internal/auth/model"
-	"dietician.local/services/account-service/internal/auth/orchestration"
 	"dietician.local/services/account-service/internal/auth/dto/request"
 	"dietician.local/services/account-service/internal/auth/dto/response"
+	"dietician.local/services/account-service/internal/auth/model"
+	"dietician.local/services/account-service/internal/auth/orchestration"
 )
 
 type IAuthHandler interface {
@@ -41,7 +43,7 @@ func NewAuthHandler(authOrchestrator orchestration.IAuthOrchestrator) IAuthHandl
 func (h *AuthHandler) Register(c *fiber.Ctx) error {
 	var req request.RegisterRequest
 	if err := c.BodyParser(&req); err != nil {
-		return pkgresponse.Error(c, fiber.StatusBadRequest, "invalid request body")
+		return pkgresponse.Error(c, fiber.StatusBadRequest, utils.TranslateByIDWithContext(c.UserContext(), constants.InvalidRequestBody))
 	}
 
 	if err := validation.Validate.Struct(req); err != nil {
@@ -80,7 +82,7 @@ func (h *AuthHandler) Register(c *fiber.Ctx) error {
 func (h *AuthHandler) VerifyOTP(c *fiber.Ctx) error {
 	var req request.VerifyOTPRequest
 	if err := c.BodyParser(&req); err != nil {
-		return pkgresponse.Error(c, fiber.StatusBadRequest, "invalid request body")
+		return pkgresponse.Error(c, fiber.StatusBadRequest, utils.TranslateByIDWithContext(c.UserContext(), constants.InvalidRequestBody))
 	}
 
 	if err := validation.Validate.Struct(req); err != nil {
@@ -119,7 +121,7 @@ func (h *AuthHandler) VerifyOTP(c *fiber.Ctx) error {
 func (h *AuthHandler) Login(c *fiber.Ctx) error {
 	var req request.LoginRequest
 	if err := c.BodyParser(&req); err != nil {
-		return pkgresponse.Error(c, fiber.StatusBadRequest, "invalid request body")
+		return pkgresponse.Error(c, fiber.StatusBadRequest, utils.TranslateByIDWithContext(c.UserContext(), constants.InvalidRequestBody))
 	}
 
 	if err := validation.Validate.Struct(req); err != nil {
@@ -158,7 +160,7 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 func (h *AuthHandler) Refresh(c *fiber.Ctx) error {
 	var req request.RefreshRequest
 	if err := c.BodyParser(&req); err != nil {
-		return pkgresponse.Error(c, fiber.StatusBadRequest, "invalid request body")
+		return pkgresponse.Error(c, fiber.StatusBadRequest, utils.TranslateByIDWithContext(c.UserContext(), constants.InvalidRequestBody))
 	}
 
 	if err := validation.Validate.Struct(req); err != nil {
@@ -195,7 +197,7 @@ func (h *AuthHandler) Refresh(c *fiber.Ctx) error {
 func (h *AuthHandler) Logout(c *fiber.Ctx) error {
 	userID := middleware.GetUserID(c.UserContext())
 	if userID == "" {
-		return pkgresponse.Error(c, fiber.StatusUnauthorized, "unauthorized")
+		return pkgresponse.Error(c, fiber.StatusUnauthorized, utils.TranslateByIDWithContext(c.UserContext(), constants.Unauthorized))
 	}
 
 	token := middleware.ExtractBearerToken(c)

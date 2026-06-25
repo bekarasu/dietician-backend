@@ -46,7 +46,7 @@ func NewUserService(
 
 func (s *UserService) Register(ctx context.Context, req model.RegisterRequest) (*model.Register, error) {
 	if len(req.Password) < 8 {
-		return nil, errors.New("password must be at least 8 characters")
+		return nil, errors.New(utils.TranslateByIDWithContext(ctx, constants.PasswordTooShort))
 	}
 
 	existing, err := s.userRepo.GetByEmail(ctx, req.Email)
@@ -184,7 +184,7 @@ func (s *UserService) Refresh(ctx context.Context, req model.RefreshRequest) (*m
 		return nil, err
 	}
 	if user == nil {
-		return nil, errors.New("user not found")
+		return nil, errors.New(utils.TranslateByIDWithContext(ctx, constants.UserNotFound))
 	}
 
 	if err := s.refreshTokenSvc.DeleteRefreshTokensByUserID(ctx, user.ID); err != nil {

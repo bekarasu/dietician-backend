@@ -3,8 +3,10 @@ package handler
 import (
 	"github.com/gofiber/fiber/v2"
 
+	"dietician.local/packages/constants"
 	"dietician.local/packages/middleware"
 	pkgresponse "dietician.local/packages/response"
+	"dietician.local/packages/utils"
 	"dietician.local/packages/validation"
 	"dietician.local/services/account-service/internal/profile/dto/request"
 	"dietician.local/services/account-service/internal/profile/orchestration"
@@ -65,7 +67,7 @@ func (h *ProfileHandler) UpsertProfile(c *fiber.Ctx) error {
 
 	var req request.UpdateProfileRequest
 	if err := c.BodyParser(&req); err != nil {
-		return pkgresponse.Error(c, fiber.StatusBadRequest, "invalid request body")
+		return pkgresponse.Error(c, fiber.StatusBadRequest, utils.TranslateByIDWithContext(c.UserContext(), constants.InvalidRequestBody))
 	}
 
 	if err := validation.Validate.Struct(req); err != nil {
@@ -118,12 +120,12 @@ func (h *ProfileHandler) GetPreferences(c *fiber.Ctx) error {
 func (h *ProfileHandler) UpdatePreferences(c *fiber.Ctx) error {
 	userID := middleware.GetUserID(c.UserContext())
 	if userID == "" {
-		return pkgresponse.Error(c, fiber.StatusBadRequest, "user ID is required")
+		return pkgresponse.Error(c, fiber.StatusBadRequest, utils.TranslateByIDWithContext(c.UserContext(), constants.UserIDRequired))
 	}
 
 	var req request.UpdatePreferencesRequest
 	if err := c.BodyParser(&req); err != nil {
-		return pkgresponse.Error(c, fiber.StatusBadRequest, "invalid request body")
+		return pkgresponse.Error(c, fiber.StatusBadRequest, utils.TranslateByIDWithContext(c.UserContext(), constants.InvalidRequestBody))
 	}
 
 	if err := validation.Validate.Struct(req); err != nil {

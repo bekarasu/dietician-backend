@@ -3,8 +3,10 @@ package handler
 import (
 	"github.com/gofiber/fiber/v2"
 
+	"dietician.local/packages/constants"
 	"dietician.local/packages/middleware"
 	"dietician.local/packages/response"
+	"dietician.local/packages/utils"
 	"dietician.local/services/medical-service/internal/uploads/dto/request"
 	_ "dietician.local/services/medical-service/internal/uploads/dto/response"
 	"dietician.local/services/medical-service/internal/uploads/orchestration"
@@ -45,24 +47,24 @@ func (h *medicalHandler) CreateUpload(c *fiber.Ctx) error {
 
 	file, err := c.FormFile("file")
 	if err != nil {
-		return response.Error(c, fiber.StatusBadRequest, "file is required")
+		return response.Error(c, fiber.StatusBadRequest, utils.TranslateByIDWithContext(c.UserContext(), constants.FileIsRequired))
 	}
 
 	var req request.CreateUploadRequest
 	if err := c.BodyParser(&req); err != nil {
-		return response.Error(c, fiber.StatusBadRequest, "invalid request body")
+		return response.Error(c, fiber.StatusBadRequest, utils.TranslateByIDWithContext(c.UserContext(), constants.InvalidRequestBody))
 	}
 
 	// Read file content
 	src, err := file.Open()
 	if err != nil {
-		return response.Error(c, fiber.StatusInternalServerError, "failed to open file")
+		return response.Error(c, fiber.StatusInternalServerError, utils.TranslateByIDWithContext(c.UserContext(), constants.FailedToOpenFile))
 	}
 	defer src.Close()
 
 	buf := make([]byte, file.Size)
 	if _, err := src.Read(buf); err != nil {
-		return response.Error(c, fiber.StatusInternalServerError, "failed to read file")
+		return response.Error(c, fiber.StatusInternalServerError, utils.TranslateByIDWithContext(c.UserContext(), constants.FailedToReadFile))
 	}
 
 	req.File = &request.FileData{
@@ -74,7 +76,7 @@ func (h *medicalHandler) CreateUpload(c *fiber.Ctx) error {
 
 	res, err := h.medOrchestrator.CreateUpload(c.Context(), userID, req)
 	if err != nil {
-		return response.Error(c, fiber.StatusInternalServerError, "failed to create upload")
+		return response.Error(c, fiber.StatusInternalServerError, utils.TranslateByIDWithContext(c.UserContext(), constants.FailedToCreateUpload))
 	}
 
 	return response.Success(c, "upload created successfully", res)
@@ -95,7 +97,7 @@ func (h *medicalHandler) ListUploads(c *fiber.Ctx) error {
 
 	res, err := h.medOrchestrator.ListUploads(c.Context(), userID)
 	if err != nil {
-		return response.Error(c, fiber.StatusInternalServerError, "failed to list uploads")
+		return response.Error(c, fiber.StatusInternalServerError, utils.TranslateByIDWithContext(c.UserContext(), constants.FailedToListUploads))
 	}
 
 	return response.Success(c, "uploads retrieved successfully", res)
@@ -117,12 +119,12 @@ func (h *medicalHandler) GetUploadDetail(c *fiber.Ctx) error {
 	userID := middleware.GetUserID(c.UserContext())
 	uploadID := c.Params("uploadId")
 	if uploadID == "" {
-		return response.Error(c, fiber.StatusBadRequest, "invalid upload id")
+		return response.Error(c, fiber.StatusBadRequest, utils.TranslateByIDWithContext(c.UserContext(), constants.InvalidUploadID))
 	}
 
 	res, err := h.medOrchestrator.GetUploadDetail(c.Context(), userID, uploadID)
 	if err != nil {
-		return response.Error(c, fiber.StatusInternalServerError, "failed to get upload details")
+		return response.Error(c, fiber.StatusInternalServerError, utils.TranslateByIDWithContext(c.UserContext(), constants.FailedToGetUploadDetails))
 	}
 
 	return response.Success(c, "upload details retrieved successfully", res)
@@ -144,12 +146,12 @@ func (h *medicalHandler) DeleteUpload(c *fiber.Ctx) error {
 	userID := middleware.GetUserID(c.UserContext())
 	uploadID := c.Params("uploadId")
 	if uploadID == "" {
-		return response.Error(c, fiber.StatusBadRequest, "invalid upload id")
+		return response.Error(c, fiber.StatusBadRequest, utils.TranslateByIDWithContext(c.UserContext(), constants.InvalidUploadID))
 	}
 
 	err := h.medOrchestrator.DeleteUpload(c.Context(), userID, uploadID)
 	if err != nil {
-		return response.Error(c, fiber.StatusInternalServerError, "failed to delete upload")
+		return response.Error(c, fiber.StatusInternalServerError, utils.TranslateByIDWithContext(c.UserContext(), constants.FailedToDeleteUpload))
 	}
 
 	return response.Success(c, "upload deleted successfully", nil)

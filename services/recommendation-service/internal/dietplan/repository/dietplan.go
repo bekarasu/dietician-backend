@@ -5,8 +5,10 @@ import (
 	"database/sql"
 	"errors"
 
-	"github.com/jmoiron/sqlx"
+	"dietician.local/packages/constants"
+	"dietician.local/packages/utils"
 	"dietician.local/services/recommendation-service/internal/dietplan/model"
+	"github.com/jmoiron/sqlx"
 )
 
 type IDietPlanRepository interface {
@@ -70,7 +72,7 @@ func (r *dietPlanRepository) GetDietPlanByID(ctx context.Context, id string) (*m
 	err := r.db.GetContext(ctx, &plan, "SELECT * FROM diet_plans WHERE id = $1", id)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, errors.New("diet plan not found")
+			return nil, errors.New(utils.TranslateByIDWithContext(ctx, constants.DietPlanNotFound))
 		}
 		return nil, err
 	}

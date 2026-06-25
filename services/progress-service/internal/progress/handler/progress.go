@@ -3,7 +3,9 @@ package handler
 import (
 	"github.com/gofiber/fiber/v2"
 
+	"dietician.local/packages/constants"
 	"dietician.local/packages/response"
+	"dietician.local/packages/utils"
 	requestdto "dietician.local/services/progress-service/internal/progress/dto/request"
 	_ "dietician.local/services/progress-service/internal/progress/dto/response"
 	"dietician.local/services/progress-service/internal/progress/orchestration"
@@ -43,7 +45,7 @@ func (h *progressHandler) GetProgress(c *fiber.Ctx) error {
 
 	progress, err := h.progressOrchestrator.GetProgress(c.Context(), userID)
 	if err != nil {
-		return response.Error(c, fiber.StatusInternalServerError, "failed to get progress")
+		return response.Error(c, fiber.StatusInternalServerError, utils.TranslateByIDWithContext(c.UserContext(), constants.FailedToGetProgress))
 	}
 
 	return response.Success(c, "progress retrieved successfully", progress)
@@ -67,7 +69,7 @@ func (h *progressHandler) AddWeight(c *fiber.Ctx) error {
 	var req requestdto.AddWeightRequest
 
 	if err := c.BodyParser(&req); err != nil {
-		return response.Error(c, fiber.StatusBadRequest, "invalid request body")
+		return response.Error(c, fiber.StatusBadRequest, utils.TranslateByIDWithContext(c.UserContext(), constants.InvalidRequestBody))
 	}
 
 	log, err := h.progressOrchestrator.AddWeight(c.Context(), userID, req)
@@ -94,7 +96,7 @@ func (h *progressHandler) GetWeeklySummary(c *fiber.Ctx) error {
 
 	summary, err := h.progressOrchestrator.GetWeeklySummary(c.Context(), userID)
 	if err != nil {
-		return response.Error(c, fiber.StatusInternalServerError, "failed to get weekly summary")
+		return response.Error(c, fiber.StatusInternalServerError, utils.TranslateByIDWithContext(c.UserContext(), constants.FailedToGetWeeklySummary))
 	}
 
 	return response.Success(c, "weekly summary retrieved successfully", summary)
@@ -118,7 +120,7 @@ func (h *progressHandler) AddHabit(c *fiber.Ctx) error {
 	var req requestdto.AddHabitRequest
 
 	if err := c.BodyParser(&req); err != nil {
-		return response.Error(c, fiber.StatusBadRequest, "invalid request body")
+		return response.Error(c, fiber.StatusBadRequest, utils.TranslateByIDWithContext(c.UserContext(), constants.InvalidRequestBody))
 	}
 
 	log, err := h.progressOrchestrator.AddHabit(c.Context(), userID, req)

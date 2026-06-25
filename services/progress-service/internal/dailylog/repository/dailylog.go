@@ -5,8 +5,10 @@ import (
 	"database/sql"
 	"errors"
 
-	"github.com/jmoiron/sqlx"
+	"dietician.local/packages/constants"
+	"dietician.local/packages/utils"
 	"dietician.local/services/progress-service/internal/dailylog/model"
+	"github.com/jmoiron/sqlx"
 )
 
 type IDailyLogRepository interface {
@@ -79,7 +81,7 @@ func (r *dailyLogRepository) GetDailyLog(ctx context.Context, userID, date strin
 	err := r.db.GetContext(ctx, &log, "SELECT * FROM daily_logs WHERE user_id = $1 AND log_date = $2", userID, date)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, errors.New("daily log not found")
+			return nil, errors.New(utils.TranslateByIDWithContext(ctx, constants.DailyLogNotFound))
 		}
 		return nil, err
 	}
