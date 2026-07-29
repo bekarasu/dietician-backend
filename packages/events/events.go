@@ -42,42 +42,42 @@ func (n *NoopPublisher) Publish(ctx context.Context, topic string, payload any) 
 // --- Common event payloads ---
 
 type UserRegisteredPayload struct {
-	UserID string `json:"user_id"`
+	UserID string `json:"userId"`
 	Email  string `json:"email"`
 }
 
 type ProfileUpdatedPayload struct {
-	UserID string `json:"user_id"`
+	UserID string `json:"userId"`
 }
 
 type WeightLoggedPayload struct {
-	UserID   string  `json:"user_id"`
-	WeightKg float64 `json:"weight_kg"`
+	UserID   string  `json:"userId"`
+	WeightKg float64 `json:"weightKg"`
 }
 
 type MealLoggedPayload struct {
-	UserID   string `json:"user_id"`
-	MealType string `json:"meal_type"`
+	UserID   string `json:"userId"`
+	MealType string `json:"mealType"`
 	Calories *int   `json:"calories,omitempty"`
 }
 
 type HydrationLoggedPayload struct {
-	UserID   string `json:"user_id"`
-	AmountMl int    `json:"amount_ml"`
+	UserID   string `json:"userId"`
+	AmountMl int    `json:"amountMl"`
 }
 
 type MedicalFileUploadedPayload struct {
-	UserID   string `json:"user_id"`
-	UploadID string `json:"upload_id"`
+	UserID   string `json:"userId"`
+	UploadID string `json:"uploadId"`
 }
 
 type RecommendationGeneratedPayload struct {
-	UserID    string `json:"user_id"`
-	RequestID string `json:"request_id"`
+	UserID    string `json:"userId"`
+	RequestID string `json:"requestId"`
 	Type      string `json:"type"`
 }
 
 type WeeklyProgressEvaluatedPayload struct {
-	UserID    string `json:"user_id"`
-	WeekStart string `json:"week_start"`
+	UserID    string `json:"userId"`
+	WeekStart string `json:"weekStart"`
 }

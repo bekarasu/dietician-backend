@@ -5,11 +5,11 @@ import "time"
 type User struct {
 	ID         string    `json:"id"`
 	Email      string    `json:"email"`
-	FirstName  string    `json:"first_name"`
-	LastName   string    `json:"last_name"`
-	IsVerified bool      `json:"is_verified"`
-	CreatedAt  time.Time `json:"created_at"`
-	UpdatedAt  time.Time `json:"updated_at"`
+	FirstName  string    `json:"firstName"`
+	LastName   string    `json:"lastName"`
+	IsVerified bool      `json:"isVerified"`
+	CreatedAt  time.Time `json:"createdAt"`
+	UpdatedAt  time.Time `json:"updatedAt"`
 }
 
 type RegisterResponse struct {
@@ -17,6 +17,6 @@ type RegisterResponse struct {
 }
 
 type AuthResponse struct {
-	AccessToken  string `json:"access_token"`
-	RefreshToken string `json:"refresh_token"`
+	AccessToken  string `json:"accessToken"`
+	RefreshToken string `json:"refreshToken"`
 }

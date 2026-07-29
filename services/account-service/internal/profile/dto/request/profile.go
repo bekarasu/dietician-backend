@@ -3,18 +3,18 @@ package request
 import "dietician.local/services/account-service/internal/profile/model"
 
 type UpdateProfileRequest struct {
-	DateOfBirth   *string  `json:"date_of_birth,omitempty" validate:"omitempty,datetime=2006-01-02"`
+	DateOfBirth   *string  `json:"dateOfBirth,omitempty" validate:"omitempty,datetime=2006-01-02"`
 	Gender        *string  `json:"gender,omitempty"`
-	HeightCm      *float64 `json:"height_cm,omitempty" validate:"omitempty,gt=0"`
-	WeightKg      *float64 `json:"weight_kg,omitempty" validate:"omitempty,gt=0"`
-	ActivityLevel *string  `json:"activity_level,omitempty"`
+	HeightCm      *float64 `json:"heightCm,omitempty" validate:"omitempty,gt=0"`
+	WeightKg      *float64 `json:"weightKg,omitempty" validate:"omitempty,gt=0"`
+	ActivityLevel *string  `json:"activityLevel,omitempty"`
 	Goal               *string  `json:"goal,omitempty"`
 	Age                *int     `json:"age,omitempty"`
-	DisplayName        *string  `json:"display_name,omitempty"`
-	TargetWeightKg     *float64 `json:"target_weight_kg,omitempty"`
-	DailyCalorieTarget *int     `json:"daily_calorie_target,omitempty"`
-	TargetWaterMl      *int     `json:"target_water_ml,omitempty"`
-	TargetCoffeeCups   *int     `json:"target_coffee_cups,omitempty"`
+	DisplayName        *string  `json:"displayName,omitempty"`
+	TargetWeightKg     *float64 `json:"targetWeightKg,omitempty"`
+	DailyCalorieTarget *int     `json:"dailyCalorieTarget,omitempty"`
+	TargetWaterMl      *int     `json:"targetWaterMl,omitempty"`
+	TargetCoffeeCups   *int     `json:"targetCoffeeCups,omitempty"`
 }
 
 type OnboardingRequest struct {
@@ -36,7 +36,7 @@ type OnboardingRequest struct {
 type UpdatePreferencesRequest struct {
 	Preferences   []string       `json:"preferences" validate:"dive,required"`
 	Allergies     []AllergyInput `json:"allergies" validate:"dive"`
-	DislikedFoods []string       `json:"disliked_foods" validate:"dive,required"`
+	DislikedFoods []string       `json:"dislikedFoods" validate:"dive,required"`
 }
 
 type AllergyInput struct {

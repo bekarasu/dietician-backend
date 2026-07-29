@@ -6,27 +6,27 @@ type User struct {
 	ID           string    `db:"id" json:"id"`
 	Email        string    `db:"email" json:"email"`
 	PasswordHash string    `db:"password_hash" json:"-"`
-	FirstName    string    `db:"first_name" json:"first_name"`
-	LastName     string    `db:"last_name" json:"last_name"`
-	IsVerified   bool      `db:"is_verified" json:"is_verified"`
-	CreatedAt    time.Time `db:"created_at" json:"created_at"`
-	UpdatedAt    time.Time `db:"updated_at" json:"updated_at"`
+	FirstName    string    `db:"first_name" json:"firstName"`
+	LastName     string    `db:"last_name" json:"lastName"`
+	IsVerified   bool      `db:"is_verified" json:"isVerified"`
+	CreatedAt    time.Time `db:"created_at" json:"createdAt"`
+	UpdatedAt    time.Time `db:"updated_at" json:"updatedAt"`
 }
 
 type OTP struct {
 	ID        string    `db:"id" json:"id"`
 	Email     string    `db:"email" json:"email"`
-	OTPCode   string    `db:"otp_code" json:"otp_code"`
-	ExpiresAt time.Time `db:"expires_at" json:"expires_at"`
-	CreatedAt time.Time `db:"created_at" json:"created_at"`
+	OTPCode   string    `db:"otp_code" json:"otpCode"`
+	ExpiresAt time.Time `db:"expires_at" json:"expiresAt"`
+	CreatedAt time.Time `db:"created_at" json:"createdAt"`
 }
 
 type RefreshToken struct {
 	ID        string    `db:"id" json:"id"`
-	UserID    string    `db:"user_id" json:"user_id"`
+	UserID    string    `db:"user_id" json:"userId"`
 	Token     string    `db:"token" json:"token"`
-	ExpiresAt time.Time `db:"expires_at" json:"expires_at"`
-	CreatedAt time.Time `db:"created_at" json:"created_at"`
+	ExpiresAt time.Time `db:"expires_at" json:"expiresAt"`
+	CreatedAt time.Time `db:"created_at" json:"createdAt"`
 }
 
 type RegisterRequest struct {

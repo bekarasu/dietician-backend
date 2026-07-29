@@ -8,7 +8,7 @@ type ErrorResponse struct {
 	Error     string `json:"error"`
 	Message   string `json:"message,omitempty"`
 	Code      int    `json:"code"`
-	RequestID string `json:"request_id,omitempty"`
+	RequestID string `json:"requestId,omitempty"`
 }
 
 type SuccessResponse struct {
