@@ -14,8 +14,14 @@ type UserProfile struct {
 	HeightCm      *float64  `db:"height_cm" json:"height_cm,omitempty"`
 	WeightKg      *float64  `db:"weight_kg" json:"weight_kg,omitempty"`
 	ActivityLevel *string   `db:"activity_level" json:"activity_level,omitempty"`
-	Goal          *string   `db:"goal" json:"goal,omitempty"`
-	CreatedAt     time.Time `db:"created_at" json:"created_at"`
+	Goal               *string   `db:"goal" json:"goal,omitempty"`
+	Age                *int      `db:"age" json:"age,omitempty"`
+	DisplayName        *string   `db:"display_name" json:"display_name,omitempty"`
+	TargetWeightKg     *float64  `db:"target_weight_kg" json:"target_weight_kg,omitempty"`
+	DailyCalorieTarget *int      `db:"daily_calorie_target" json:"daily_calorie_target,omitempty"`
+	TargetWaterMl      *int      `db:"target_water_ml" json:"target_water_ml,omitempty"`
+	TargetCoffeeCups   *int      `db:"target_coffee_cups" json:"target_coffee_cups,omitempty"`
+	CreatedAt          time.Time `db:"created_at" json:"created_at"`
 	UpdatedAt     time.Time `db:"updated_at" json:"updated_at"`
 }
 
@@ -47,7 +53,30 @@ type UpdateProfileRequest struct {
 	HeightCm      *float64 `json:"height_cm,omitempty"`
 	WeightKg      *float64 `json:"weight_kg,omitempty"`
 	ActivityLevel *string  `json:"activity_level,omitempty"`
-	Goal          *string  `json:"goal,omitempty"`
+	Goal               *string  `json:"goal,omitempty"`
+	Age                *int     `json:"age,omitempty"`
+	DisplayName        *string  `json:"display_name,omitempty"`
+	TargetWeightKg     *float64 `json:"target_weight_kg,omitempty"`
+	DailyCalorieTarget *int     `json:"daily_calorie_target,omitempty"`
+	TargetWaterMl      *int     `json:"target_water_ml,omitempty"`
+	TargetCoffeeCups   *int     `json:"target_coffee_cups,omitempty"`
+}
+
+type OnboardingRequest struct {
+	Name               string   `json:"name"`
+	Age                int      `json:"age"`
+	HeightCm           float64  `json:"heightCm"`
+	WeightKg           float64  `json:"weightKg"`
+	TargetWeightKg     float64  `json:"targetWeightKg"`
+	Gender             string   `json:"gender"`
+	ActivityLevel      string   `json:"activityLevel"`
+	GoalType           string   `json:"goalType"`
+	DietaryPreferences []string `json:"dietaryPreferences"`
+	DislikedFoods      string   `json:"dislikedFoods"`
+	Allergies          string   `json:"allergies"`
+	DailyCalorieTarget *int     `json:"dailyCalorieTarget,omitempty"`
+	TargetWaterMl      int      `json:"targetWaterMl"`
+	TargetCoffeeCups   int      `json:"targetCoffeeCups"`
 }
 
 type UpdatePreferencesRequest struct {
@@ -111,9 +140,15 @@ func (profile *UserProfile) ToResource() *response.UserProfile {
 		Gender:        profile.Gender,
 		HeightCm:      profile.HeightCm,
 		WeightKg:      profile.WeightKg,
-		ActivityLevel: profile.ActivityLevel,
-		Goal:          profile.Goal,
-		CreatedAt:     profile.CreatedAt,
+		ActivityLevel:      profile.ActivityLevel,
+		Goal:               profile.Goal,
+		Age:                profile.Age,
+		DisplayName:        profile.DisplayName,
+		TargetWeightKg:     profile.TargetWeightKg,
+		DailyCalorieTarget: profile.DailyCalorieTarget,
+		TargetWaterMl:      profile.TargetWaterMl,
+		TargetCoffeeCups:   profile.TargetCoffeeCups,
+		CreatedAt:          profile.CreatedAt,
 		UpdatedAt:     profile.UpdatedAt,
 	}
 }

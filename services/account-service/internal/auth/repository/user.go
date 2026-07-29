@@ -13,6 +13,7 @@ type IUserRepository interface {
 	GetByEmail(ctx context.Context, email string) (*model.User, error)
 	GetByID(ctx context.Context, id string) (*model.User, error)
 	MarkVerified(ctx context.Context, id string) error
+	UpdateUnverified(ctx context.Context, user *model.User) error
 }
 
 type UserRepository struct {
@@ -56,5 +57,11 @@ func (r *UserRepository) GetByID(ctx context.Context, id string) (*model.User, e
 
 func (r *UserRepository) MarkVerified(ctx context.Context, id string) error {
 	_, err := r.db.ExecContext(ctx, `UPDATE users SET is_verified = true, updated_at = NOW() WHERE id = $1`, id)
+	return err
+}
+
+func (r *UserRepository) UpdateUnverified(ctx context.Context, user *model.User) error {
+	query := `UPDATE users SET password_hash = $1, first_name = $2, last_name = $3, updated_at = NOW() WHERE id = $4 AND is_verified = false`
+	_, err := r.db.ExecContext(ctx, query, user.PasswordHash, user.FirstName, user.LastName, user.ID)
 	return err
 }

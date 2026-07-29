@@ -53,7 +53,7 @@ func (s *UserService) Register(ctx context.Context, req model.RegisterRequest) (
 	if err != nil {
 		return nil, err
 	}
-	if existing != nil {
+	if existing != nil && existing.IsVerified {
 		return nil, errors.New(utils.TranslateByIDWithContext(ctx, constants.EmailAlreadyRegistered))
 	}
 
@@ -62,15 +62,24 @@ func (s *UserService) Register(ctx context.Context, req model.RegisterRequest) (
 		return nil, err
 	}
 
-	user := &model.User{
-		Email:        req.Email,
-		PasswordHash: string(hash),
-		FirstName:    req.FirstName,
-		LastName:     req.LastName,
-		IsVerified:   false,
-	}
-	if err := s.userRepo.Create(ctx, user); err != nil {
-		return nil, err
+	if existing != nil {
+		existing.PasswordHash = string(hash)
+		existing.FirstName = req.FirstName
+		existing.LastName = req.LastName
+		if err := s.userRepo.UpdateUnverified(ctx, existing); err != nil {
+			return nil, err
+		}
+	} else {
+		user := &model.User{
+			Email:        req.Email,
+			PasswordHash: string(hash),
+			FirstName:    req.FirstName,
+			LastName:     req.LastName,
+			IsVerified:   false,
+		}
+		if err := s.userRepo.Create(ctx, user); err != nil {
+			return nil, err
+		}
 	}
 
 	code := s.otpSvc.Generate()

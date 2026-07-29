@@ -18,7 +18,9 @@ func NewProfileRepository(db *sqlx.DB) *ProfileRepository {
 
 func (r *ProfileRepository) GetByUserID(ctx context.Context, userID string) (*model.UserProfile, error) {
 	var profile model.UserProfile
-	query := `SELECT id, user_id, date_of_birth, gender, height_cm, weight_kg, activity_level, goal, created_at, updated_at
+	query := `SELECT id, user_id, date_of_birth, gender, height_cm, weight_kg, activity_level, goal, 
+		age, display_name, target_weight_kg, daily_calorie_target, target_water_ml, target_coffee_cups,
+		created_at, updated_at
 		FROM user_profiles WHERE user_id = $1`
 	err := r.db.GetContext(ctx, &profile, query, userID)
 	if err == sql.ErrNoRows {
@@ -28,8 +30,8 @@ func (r *ProfileRepository) GetByUserID(ctx context.Context, userID string) (*mo
 }
 
 func (r *ProfileRepository) Upsert(ctx context.Context, profile *model.UserProfile) error {
-	query := `INSERT INTO user_profiles (user_id, date_of_birth, gender, height_cm, weight_kg, activity_level, goal)
-		VALUES ($1, $2, $3, $4, $5, $6, $7)
+	query := `INSERT INTO user_profiles (user_id, date_of_birth, gender, height_cm, weight_kg, activity_level, goal, age, display_name, target_weight_kg, daily_calorie_target, target_water_ml, target_coffee_cups)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
 		ON CONFLICT (user_id) DO UPDATE SET
 			date_of_birth = COALESCE(EXCLUDED.date_of_birth, user_profiles.date_of_birth),
 			gender = COALESCE(EXCLUDED.gender, user_profiles.gender),
@@ -37,11 +39,19 @@ func (r *ProfileRepository) Upsert(ctx context.Context, profile *model.UserProfi
 			weight_kg = COALESCE(EXCLUDED.weight_kg, user_profiles.weight_kg),
 			activity_level = COALESCE(EXCLUDED.activity_level, user_profiles.activity_level),
 			goal = COALESCE(EXCLUDED.goal, user_profiles.goal),
+			age = COALESCE(EXCLUDED.age, user_profiles.age),
+			display_name = COALESCE(EXCLUDED.display_name, user_profiles.display_name),
+			target_weight_kg = COALESCE(EXCLUDED.target_weight_kg, user_profiles.target_weight_kg),
+			daily_calorie_target = COALESCE(EXCLUDED.daily_calorie_target, user_profiles.daily_calorie_target),
+			target_water_ml = COALESCE(EXCLUDED.target_water_ml, user_profiles.target_water_ml),
+			target_coffee_cups = COALESCE(EXCLUDED.target_coffee_cups, user_profiles.target_coffee_cups),
 			updated_at = NOW()
 		RETURNING id, created_at, updated_at`
 	return r.db.QueryRowContext(ctx, query,
 		profile.UserID, profile.DateOfBirth, profile.Gender,
 		profile.HeightCm, profile.WeightKg, profile.ActivityLevel, profile.Goal,
+		profile.Age, profile.DisplayName, profile.TargetWeightKg, profile.DailyCalorieTarget,
+		profile.TargetWaterMl, profile.TargetCoffeeCups,
 	).Scan(&profile.ID, &profile.CreatedAt, &profile.UpdatedAt)
 }
 

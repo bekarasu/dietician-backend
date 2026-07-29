@@ -15,6 +15,7 @@ import (
 type IProfileHandler interface {
 	GetProfile(c *fiber.Ctx) error
 	UpsertProfile(c *fiber.Ctx) error
+	Onboarding(c *fiber.Ctx) error
 	GetPreferences(c *fiber.Ctx) error
 	UpdatePreferences(c *fiber.Ctx) error
 }
@@ -80,6 +81,42 @@ func (h *ProfileHandler) UpsertProfile(c *fiber.Ctx) error {
 	}
 
 	return pkgresponse.Success(c, "profile updated", profile.ToResource())
+}
+
+// Onboarding handles the comprehensive onboarding endpoint after registration.
+// @Summary Onboarding Profile Setup
+// @Description Sets up the user's profile and preferences in one step
+// @Tags Profile
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body request.OnboardingRequest true "Onboarding Request"
+// @Success 200 {object} pkgresponse.SuccessResponse{data=response.UserProfile}
+// @Failure 400 {object} pkgresponse.ErrorResponse
+// @Failure 401 {object} pkgresponse.ErrorResponse
+// @Failure 500 {object} pkgresponse.ErrorResponse
+// @Router /api/v1/profiles/onboarding [post]
+func (h *ProfileHandler) Onboarding(c *fiber.Ctx) error {
+	userID := middleware.GetUserID(c.UserContext())
+	if userID == "" {
+		return pkgresponse.Error(c, fiber.StatusUnauthorized, utils.TranslateByIDWithContext(c.UserContext(), constants.UserIDRequired))
+	}
+
+	var req request.OnboardingRequest
+	if err := c.BodyParser(&req); err != nil {
+		return pkgresponse.Error(c, fiber.StatusBadRequest, utils.TranslateByIDWithContext(c.UserContext(), constants.InvalidRequestBody))
+	}
+
+	if err := validation.Validate.Struct(req); err != nil {
+		return pkgresponse.Error(c, fiber.StatusBadRequest, validation.FormatValidationError(c.UserContext(), err))
+	}
+
+	profile, err := h.profileOrchestrator.Onboarding(c.UserContext(), userID, req.ToDomain())
+	if err != nil {
+		return pkgresponse.Error(c, fiber.StatusInternalServerError, err.Error())
+	}
+
+	return pkgresponse.Success(c, "onboarding completed", profile.ToResource())
 }
 
 // GetPreferences retrieves the user's preferences.

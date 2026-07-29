@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"strings"
 
 	"dietician.local/packages/constants"
 	"dietician.local/packages/utils"
@@ -42,6 +43,65 @@ func (s *ProfileService) UpsertProfile(ctx context.Context, userID string, req *
 	if err := s.repo.Upsert(ctx, profile); err != nil {
 		return nil, err
 	}
+	return s.repo.GetByUserID(ctx, userID)
+}
+
+func (s *ProfileService) Onboarding(ctx context.Context, userID string, req *model.OnboardingRequest) (*model.UserProfile, error) {
+	var dislikedFoods []string
+	if req.DislikedFoods != "" {
+		parts := strings.Split(req.DislikedFoods, ",")
+		for _, p := range parts {
+			trimmed := strings.TrimSpace(p)
+			if trimmed != "" {
+				dislikedFoods = append(dislikedFoods, trimmed)
+			}
+		}
+	}
+
+	var allergies []model.AllergyInput
+	if req.Allergies != "" {
+		parts := strings.Split(req.Allergies, ",")
+		for _, p := range parts {
+			trimmed := strings.TrimSpace(p)
+			if trimmed != "" {
+				allergies = append(allergies, model.AllergyInput{
+					Allergy: trimmed,
+				})
+			}
+		}
+	}
+
+	profile := &model.UserProfile{
+		UserID:             userID,
+		Age:                &req.Age,
+		DisplayName:        &req.Name,
+		Gender:             &req.Gender,
+		ActivityLevel:      &req.ActivityLevel,
+		HeightCm:           &req.HeightCm,
+		WeightKg:           &req.WeightKg,
+		TargetWeightKg:     &req.TargetWeightKg,
+		Goal:               &req.GoalType,
+		DailyCalorieTarget: req.DailyCalorieTarget,
+		TargetWaterMl:      &req.TargetWaterMl,
+		TargetCoffeeCups:   &req.TargetCoffeeCups,
+	}
+
+	if err := s.repo.Upsert(ctx, profile); err != nil {
+		return nil, err
+	}
+
+	if err := s.repo.ReplacePreferences(ctx, userID, req.DietaryPreferences); err != nil {
+		return nil, err
+	}
+
+	if err := s.repo.ReplaceDislikedFoods(ctx, userID, dislikedFoods); err != nil {
+		return nil, err
+	}
+
+	if err := s.repo.ReplaceAllergies(ctx, userID, allergies); err != nil {
+		return nil, err
+	}
+
 	return s.repo.GetByUserID(ctx, userID)
 }
 

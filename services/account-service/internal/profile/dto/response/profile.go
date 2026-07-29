@@ -10,8 +10,14 @@ type UserProfile struct {
 	HeightCm      *float64  `json:"height_cm,omitempty"`
 	WeightKg      *float64  `json:"weight_kg,omitempty"`
 	ActivityLevel *string   `json:"activity_level,omitempty"`
-	Goal          *string   `json:"goal,omitempty"`
-	CreatedAt     time.Time `json:"created_at"`
+	Goal               *string   `json:"goal,omitempty"`
+	Age                *int      `json:"age,omitempty"`
+	DisplayName        *string   `json:"display_name,omitempty"`
+	TargetWeightKg     *float64  `json:"target_weight_kg,omitempty"`
+	DailyCalorieTarget *int      `json:"daily_calorie_target,omitempty"`
+	TargetWaterMl      *int      `json:"target_water_ml,omitempty"`
+	TargetCoffeeCups   *int      `json:"target_coffee_cups,omitempty"`
+	CreatedAt          time.Time `json:"created_at"`
 	UpdatedAt     time.Time `json:"updated_at"`
 }
 
