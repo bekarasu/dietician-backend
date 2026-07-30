@@ -3,13 +3,13 @@ package response
 import "time"
 
 type UserProfile struct {
-	ID            string    `json:"id"`
-	UserID        string    `json:"userId"`
-	DateOfBirth   *string   `json:"dateOfBirth,omitempty"`
-	Gender        *string   `json:"gender,omitempty"`
-	HeightCm      *float64  `json:"heightCm,omitempty"`
-	WeightKg      *float64  `json:"weightKg,omitempty"`
-	ActivityLevel *string   `json:"activityLevel,omitempty"`
+	ID                 string    `json:"id"`
+	UserID             string    `json:"userId"`
+	DateOfBirth        *string   `json:"dateOfBirth,omitempty"`
+	Gender             *string   `json:"gender,omitempty"`
+	HeightCm           *float64  `json:"heightCm,omitempty"`
+	WeightKg           *float64  `json:"weightKg,omitempty"`
+	ActivityLevel      *string   `json:"activityLevel,omitempty"`
 	Goal               *string   `json:"goal,omitempty"`
 	Age                *int      `json:"age,omitempty"`
 	DisplayName        *string   `json:"displayName,omitempty"`
@@ -18,7 +18,7 @@ type UserProfile struct {
 	TargetWaterMl      *int      `json:"targetWaterMl,omitempty"`
 	TargetCoffeeCups   *int      `json:"targetCoffeeCups,omitempty"`
 	CreatedAt          time.Time `json:"createdAt"`
-	UpdatedAt     time.Time `json:"updatedAt"`
+	UpdatedAt          time.Time `json:"updatedAt"`
 }
 
 type DietaryPreference struct {

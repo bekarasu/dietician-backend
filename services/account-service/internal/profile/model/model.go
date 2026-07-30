@@ -7,13 +7,13 @@ import (
 )
 
 type UserProfile struct {
-	ID            string    `db:"id" json:"id"`
-	UserID        string    `db:"user_id" json:"userId"`
-	DateOfBirth   *string   `db:"date_of_birth" json:"dateOfBirth,omitempty"`
-	Gender        *string   `db:"gender" json:"gender,omitempty"`
-	HeightCm      *float64  `db:"height_cm" json:"heightCm,omitempty"`
-	WeightKg      *float64  `db:"weight_kg" json:"weightKg,omitempty"`
-	ActivityLevel *string   `db:"activity_level" json:"activityLevel,omitempty"`
+	ID                 string    `db:"id" json:"id"`
+	UserID             string    `db:"user_id" json:"userId"`
+	DateOfBirth        *string   `db:"date_of_birth" json:"dateOfBirth,omitempty"`
+	Gender             *string   `db:"gender" json:"gender,omitempty"`
+	HeightCm           *float64  `db:"height_cm" json:"heightCm,omitempty"`
+	WeightKg           *float64  `db:"weight_kg" json:"weightKg,omitempty"`
+	ActivityLevel      *string   `db:"activity_level" json:"activityLevel,omitempty"`
 	Goal               *string   `db:"goal" json:"goal,omitempty"`
 	Age                *int      `db:"age" json:"age,omitempty"`
 	DisplayName        *string   `db:"display_name" json:"displayName,omitempty"`
@@ -22,7 +22,7 @@ type UserProfile struct {
 	TargetWaterMl      *int      `db:"target_water_ml" json:"targetWaterMl,omitempty"`
 	TargetCoffeeCups   *int      `db:"target_coffee_cups" json:"targetCoffeeCups,omitempty"`
 	CreatedAt          time.Time `db:"created_at" json:"createdAt"`
-	UpdatedAt     time.Time `db:"updated_at" json:"updatedAt"`
+	UpdatedAt          time.Time `db:"updated_at" json:"updatedAt"`
 }
 
 type DietaryPreference struct {
@@ -48,11 +48,11 @@ type DislikedFood struct {
 }
 
 type UpdateProfileRequest struct {
-	DateOfBirth   *string  `json:"dateOfBirth,omitempty"`
-	Gender        *string  `json:"gender,omitempty"`
-	HeightCm      *float64 `json:"heightCm,omitempty"`
-	WeightKg      *float64 `json:"weightKg,omitempty"`
-	ActivityLevel *string  `json:"activityLevel,omitempty"`
+	DateOfBirth        *string  `json:"dateOfBirth,omitempty"`
+	Gender             *string  `json:"gender,omitempty"`
+	HeightCm           *float64 `json:"heightCm,omitempty"`
+	WeightKg           *float64 `json:"weightKg,omitempty"`
+	ActivityLevel      *string  `json:"activityLevel,omitempty"`
 	Goal               *string  `json:"goal,omitempty"`
 	Age                *int     `json:"age,omitempty"`
 	DisplayName        *string  `json:"displayName,omitempty"`
@@ -134,12 +134,12 @@ func (prefs *PreferencesResponse) ToResource() *response.PreferencesResponse {
 
 func (profile *UserProfile) ToResource() *response.UserProfile {
 	return &response.UserProfile{
-		ID:            profile.ID,
-		UserID:        profile.UserID,
-		DateOfBirth:   profile.DateOfBirth,
-		Gender:        profile.Gender,
-		HeightCm:      profile.HeightCm,
-		WeightKg:      profile.WeightKg,
+		ID:                 profile.ID,
+		UserID:             profile.UserID,
+		DateOfBirth:        profile.DateOfBirth,
+		Gender:             profile.Gender,
+		HeightCm:           profile.HeightCm,
+		WeightKg:           profile.WeightKg,
 		ActivityLevel:      profile.ActivityLevel,
 		Goal:               profile.Goal,
 		Age:                profile.Age,
@@ -149,6 +149,6 @@ func (profile *UserProfile) ToResource() *response.UserProfile {
 		TargetWaterMl:      profile.TargetWaterMl,
 		TargetCoffeeCups:   profile.TargetCoffeeCups,
 		CreatedAt:          profile.CreatedAt,
-		UpdatedAt:     profile.UpdatedAt,
+		UpdatedAt:          profile.UpdatedAt,
 	}
 }
