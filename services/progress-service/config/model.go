@@ -7,8 +7,9 @@ import (
 type WebConfig struct {
 	AppName  string `mapstructure:"APP_NAME"`
 	Port     string `mapstructure:"APP_PORT"`
-	Env      string `mapstructure:"APP_ENV"`
-	LogDebug bool   `mapstructure:"LOG_DEBUG"`
+	Env               string `mapstructure:"APP_ENV"`
+	AccountServiceURL string `mapstructure:"ACCOUNT_SERVICE_URL"`
+	LogDebug          bool   `mapstructure:"LOG_DEBUG"`
 }
 
 type LanguageConfig struct {

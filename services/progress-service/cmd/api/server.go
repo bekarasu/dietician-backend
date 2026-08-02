@@ -74,6 +74,7 @@ func (s *Server) addHealthCheckRoutes() {
 func (s *Server) addCommonMiddleware() {
 	s.srv.Use(middleware.LoggerMiddleware(s.app.logger))
 	s.srv.Use(middleware.LocalizerMiddleware())
+	s.srv.Use(middleware.TokenizerContextMiddleware(s.app.tokenizer))
 }
 
 func (s *Server) Shutdown(ctx context.Context) error {

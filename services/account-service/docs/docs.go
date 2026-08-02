@@ -396,6 +396,75 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/profiles/onboarding": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Sets up the user's profile and preferences in one step",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Onboarding Profile Setup",
+                "parameters": [
+                    {
+                        "description": "Onboarding Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.OnboardingRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/response.UserProfile"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/profiles/preferences": {
             "get": {
                 "security": [
@@ -514,6 +583,63 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/api/v1/profiles/weight": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Update only the weight for the authenticated user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Update User Weight",
+                "parameters": [
+                    {
+                        "description": "Update Weight Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.UpdateWeightRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.ErrorResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -546,13 +672,76 @@ const docTemplate = `{
                 }
             }
         },
+        "request.OnboardingRequest": {
+            "type": "object",
+            "required": [
+                "activityLevel",
+                "age",
+                "gender",
+                "goalType",
+                "heightCm",
+                "name",
+                "targetCoffeeCups",
+                "targetWaterMl",
+                "targetWeightKg",
+                "weightKg"
+            ],
+            "properties": {
+                "activityLevel": {
+                    "type": "string"
+                },
+                "age": {
+                    "type": "integer"
+                },
+                "allergies": {
+                    "type": "string"
+                },
+                "dailyCalorieTarget": {
+                    "type": "integer"
+                },
+                "dietaryPreferences": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "dislikedFoods": {
+                    "type": "string"
+                },
+                "gender": {
+                    "type": "string"
+                },
+                "goalType": {
+                    "type": "string"
+                },
+                "heightCm": {
+                    "type": "number"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "targetCoffeeCups": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "targetWaterMl": {
+                    "type": "integer"
+                },
+                "targetWeightKg": {
+                    "type": "number"
+                },
+                "weightKg": {
+                    "type": "number"
+                }
+            }
+        },
         "request.RefreshRequest": {
             "type": "object",
             "required": [
-                "refresh_token"
+                "refreshToken"
             ],
             "properties": {
-                "refresh_token": {
+                "refreshToken": {
                     "type": "string"
                 }
             }
@@ -561,14 +750,18 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "email",
-                "first_name",
+                "firstName",
+                "lastName",
                 "password"
             ],
             "properties": {
                 "email": {
                     "type": "string"
                 },
-                "first_name": {
+                "firstName": {
+                    "type": "string"
+                },
+                "lastName": {
                     "type": "string"
                 },
                 "password": {
@@ -580,7 +773,7 @@ const docTemplate = `{
         "request.UpdatePreferencesRequest": {
             "type": "object",
             "required": [
-                "disliked_foods",
+                "dislikedFoods",
                 "preferences"
             ],
             "properties": {
@@ -590,7 +783,7 @@ const docTemplate = `{
                         "$ref": "#/definitions/request.AllergyInput"
                     }
                 },
-                "disliked_foods": {
+                "dislikedFoods": {
                     "type": "array",
                     "items": {
                         "type": "string"
@@ -607,10 +800,19 @@ const docTemplate = `{
         "request.UpdateProfileRequest": {
             "type": "object",
             "properties": {
-                "activity_level": {
+                "activityLevel": {
                     "type": "string"
                 },
-                "date_of_birth": {
+                "age": {
+                    "type": "integer"
+                },
+                "dailyCalorieTarget": {
+                    "type": "integer"
+                },
+                "dateOfBirth": {
+                    "type": "string"
+                },
+                "displayName": {
                     "type": "string"
                 },
                 "gender": {
@@ -619,10 +821,27 @@ const docTemplate = `{
                 "goal": {
                     "type": "string"
                 },
-                "height_cm": {
+                "heightCm": {
                     "type": "number"
                 },
-                "weight_kg": {
+                "targetCoffeeCups": {
+                    "type": "integer"
+                },
+                "targetWaterMl": {
+                    "type": "integer"
+                },
+                "targetWeightKg": {
+                    "type": "number"
+                }
+            }
+        },
+        "request.UpdateWeightRequest": {
+            "type": "object",
+            "required": [
+                "weightKg"
+            ],
+            "properties": {
+                "weightKg": {
                     "type": "number"
                 }
             }
@@ -631,13 +850,13 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "otp",
-                "otp_token"
+                "otpToken"
             ],
             "properties": {
                 "otp": {
                     "type": "string"
                 },
-                "otp_token": {
+                "otpToken": {
                     "type": "string"
                 }
             }
@@ -648,7 +867,7 @@ const docTemplate = `{
                 "allergy": {
                     "type": "string"
                 },
-                "created_at": {
+                "createdAt": {
                     "type": "string"
                 },
                 "id": {
@@ -662,10 +881,10 @@ const docTemplate = `{
         "response.AuthResponse": {
             "type": "object",
             "properties": {
-                "access_token": {
+                "accessToken": {
                     "type": "string"
                 },
-                "refresh_token": {
+                "refreshToken": {
                     "type": "string"
                 }
             }
@@ -673,7 +892,7 @@ const docTemplate = `{
         "response.DietaryPreference": {
             "type": "object",
             "properties": {
-                "created_at": {
+                "createdAt": {
                     "type": "string"
                 },
                 "id": {
@@ -687,10 +906,10 @@ const docTemplate = `{
         "response.DislikedFood": {
             "type": "object",
             "properties": {
-                "created_at": {
+                "createdAt": {
                     "type": "string"
                 },
-                "food_name": {
+                "foodName": {
                     "type": "string"
                 },
                 "id": {
@@ -710,7 +929,7 @@ const docTemplate = `{
                 "message": {
                     "type": "string"
                 },
-                "request_id": {
+                "requestId": {
                     "type": "string"
                 }
             }
@@ -724,7 +943,7 @@ const docTemplate = `{
                         "$ref": "#/definitions/response.Allergy"
                     }
                 },
-                "disliked_foods": {
+                "dislikedFoods": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/response.DislikedFood"
@@ -741,7 +960,7 @@ const docTemplate = `{
         "response.RegisterResponse": {
             "type": "object",
             "properties": {
-                "otp_token": {
+                "otpToken": {
                     "type": "string"
                 }
             }
@@ -758,13 +977,22 @@ const docTemplate = `{
         "response.UserProfile": {
             "type": "object",
             "properties": {
-                "activity_level": {
+                "activityLevel": {
                     "type": "string"
                 },
-                "created_at": {
+                "age": {
+                    "type": "integer"
+                },
+                "createdAt": {
                     "type": "string"
                 },
-                "date_of_birth": {
+                "dailyCalorieTarget": {
+                    "type": "integer"
+                },
+                "dateOfBirth": {
+                    "type": "string"
+                },
+                "displayName": {
                     "type": "string"
                 },
                 "gender": {
@@ -773,19 +1001,28 @@ const docTemplate = `{
                 "goal": {
                     "type": "string"
                 },
-                "height_cm": {
+                "heightCm": {
                     "type": "number"
                 },
                 "id": {
                     "type": "string"
                 },
-                "updated_at": {
+                "targetCoffeeCups": {
+                    "type": "integer"
+                },
+                "targetWaterMl": {
+                    "type": "integer"
+                },
+                "targetWeightKg": {
+                    "type": "number"
+                },
+                "updatedAt": {
                     "type": "string"
                 },
-                "user_id": {
+                "userId": {
                     "type": "string"
                 },
-                "weight_kg": {
+                "weightKg": {
                     "type": "number"
                 }
             }

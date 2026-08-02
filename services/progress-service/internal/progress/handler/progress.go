@@ -76,7 +76,9 @@ func (h *progressHandler) AddWeight(c *fiber.Ctx) error {
 		return response.Error(c, fiber.StatusBadRequest, utils.TranslateByIDWithContext(c.UserContext(), constants.InvalidRequestBody))
 	}
 
-	log, err := h.progressOrchestrator.AddWeight(c.Context(), userID, req)
+	token := middleware.ExtractBearerToken(c)
+
+	log, err := h.progressOrchestrator.AddWeight(c.Context(), userID, req, token)
 	if err != nil {
 		return response.Error(c, fiber.StatusBadRequest, err.Error())
 	}

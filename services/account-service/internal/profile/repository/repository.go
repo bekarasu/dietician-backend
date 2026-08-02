@@ -55,6 +55,12 @@ func (r *ProfileRepository) Upsert(ctx context.Context, profile *model.UserProfi
 	).Scan(&profile.ID, &profile.CreatedAt, &profile.UpdatedAt)
 }
 
+func (r *ProfileRepository) UpdateWeight(ctx context.Context, userID string, weightKg float64) error {
+	query := `UPDATE user_profiles SET weight_kg = $1, updated_at = NOW() WHERE user_id = $2`
+	_, err := r.db.ExecContext(ctx, query, weightKg, userID)
+	return err
+}
+
 // Preferences
 
 func (r *ProfileRepository) GetPreferences(ctx context.Context, userID string) ([]model.DietaryPreference, error) {

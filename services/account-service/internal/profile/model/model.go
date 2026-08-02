@@ -51,7 +51,6 @@ type UpdateProfileRequest struct {
 	DateOfBirth        *string  `json:"dateOfBirth,omitempty"`
 	Gender             *string  `json:"gender,omitempty"`
 	HeightCm           *float64 `json:"heightCm,omitempty"`
-	WeightKg           *float64 `json:"weightKg,omitempty"`
 	ActivityLevel      *string  `json:"activityLevel,omitempty"`
 	Goal               *string  `json:"goal,omitempty"`
 	Age                *int     `json:"age,omitempty"`
@@ -60,6 +59,10 @@ type UpdateProfileRequest struct {
 	DailyCalorieTarget *int     `json:"dailyCalorieTarget,omitempty"`
 	TargetWaterMl      *int     `json:"targetWaterMl,omitempty"`
 	TargetCoffeeCups   *int     `json:"targetCoffeeCups,omitempty"`
+}
+
+type UpdateWeightRequest struct {
+	WeightKg float64 `json:"weightKg"`
 }
 
 type OnboardingRequest struct {

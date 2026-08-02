@@ -46,6 +46,10 @@ func (s *ProfileService) UpsertProfile(ctx context.Context, userID string, req *
 	return s.repo.GetByUserID(ctx, userID)
 }
 
+func (s *ProfileService) UpdateWeight(ctx context.Context, userID string, weightKg float64) error {
+	return s.repo.UpdateWeight(ctx, userID, weightKg)
+}
+
 func (s *ProfileService) Onboarding(ctx context.Context, userID string, req *model.OnboardingRequest) (*model.UserProfile, error) {
 	var dislikedFoods []string
 	if req.DislikedFoods != "" {

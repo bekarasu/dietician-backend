@@ -19,25 +19,73 @@ definitions:
     - email
     - password
     type: object
+  request.OnboardingRequest:
+    properties:
+      activityLevel:
+        type: string
+      age:
+        type: integer
+      allergies:
+        type: string
+      dailyCalorieTarget:
+        type: integer
+      dietaryPreferences:
+        items:
+          type: string
+        type: array
+      dislikedFoods:
+        type: string
+      gender:
+        type: string
+      goalType:
+        type: string
+      heightCm:
+        type: number
+      name:
+        type: string
+      targetCoffeeCups:
+        minimum: 0
+        type: integer
+      targetWaterMl:
+        type: integer
+      targetWeightKg:
+        type: number
+      weightKg:
+        type: number
+    required:
+    - activityLevel
+    - age
+    - gender
+    - goalType
+    - heightCm
+    - name
+    - targetCoffeeCups
+    - targetWaterMl
+    - targetWeightKg
+    - weightKg
+    type: object
   request.RefreshRequest:
     properties:
-      refresh_token:
+      refreshToken:
         type: string
     required:
-    - refresh_token
+    - refreshToken
     type: object
   request.RegisterRequest:
     properties:
       email:
         type: string
-      first_name:
+      firstName:
+        type: string
+      lastName:
         type: string
       password:
         minLength: 8
         type: string
     required:
     - email
-    - first_name
+    - firstName
+    - lastName
     - password
     type: object
   request.UpdatePreferencesRequest:
@@ -46,7 +94,7 @@ definitions:
         items:
           $ref: '#/definitions/request.AllergyInput'
         type: array
-      disliked_foods:
+      dislikedFoods:
         items:
           type: string
         type: array
@@ -55,39 +103,56 @@ definitions:
           type: string
         type: array
     required:
-    - disliked_foods
+    - dislikedFoods
     - preferences
     type: object
   request.UpdateProfileRequest:
     properties:
-      activity_level:
+      activityLevel:
         type: string
-      date_of_birth:
+      age:
+        type: integer
+      dailyCalorieTarget:
+        type: integer
+      dateOfBirth:
+        type: string
+      displayName:
         type: string
       gender:
         type: string
       goal:
         type: string
-      height_cm:
+      heightCm:
         type: number
-      weight_kg:
+      targetCoffeeCups:
+        type: integer
+      targetWaterMl:
+        type: integer
+      targetWeightKg:
         type: number
+    type: object
+  request.UpdateWeightRequest:
+    properties:
+      weightKg:
+        type: number
+    required:
+    - weightKg
     type: object
   request.VerifyOTPRequest:
     properties:
       otp:
         type: string
-      otp_token:
+      otpToken:
         type: string
     required:
     - otp
-    - otp_token
+    - otpToken
     type: object
   response.Allergy:
     properties:
       allergy:
         type: string
-      created_at:
+      createdAt:
         type: string
       id:
         type: string
@@ -96,14 +161,14 @@ definitions:
     type: object
   response.AuthResponse:
     properties:
-      access_token:
+      accessToken:
         type: string
-      refresh_token:
+      refreshToken:
         type: string
     type: object
   response.DietaryPreference:
     properties:
-      created_at:
+      createdAt:
         type: string
       id:
         type: string
@@ -112,9 +177,9 @@ definitions:
     type: object
   response.DislikedFood:
     properties:
-      created_at:
+      createdAt:
         type: string
-      food_name:
+      foodName:
         type: string
       id:
         type: string
@@ -127,7 +192,7 @@ definitions:
         type: string
       message:
         type: string
-      request_id:
+      requestId:
         type: string
     type: object
   response.PreferencesResponse:
@@ -136,7 +201,7 @@ definitions:
         items:
           $ref: '#/definitions/response.Allergy'
         type: array
-      disliked_foods:
+      dislikedFoods:
         items:
           $ref: '#/definitions/response.DislikedFood'
         type: array
@@ -147,7 +212,7 @@ definitions:
     type: object
   response.RegisterResponse:
     properties:
-      otp_token:
+      otpToken:
         type: string
     type: object
   response.SuccessResponse:
@@ -158,25 +223,37 @@ definitions:
     type: object
   response.UserProfile:
     properties:
-      activity_level:
+      activityLevel:
         type: string
-      created_at:
+      age:
+        type: integer
+      createdAt:
         type: string
-      date_of_birth:
+      dailyCalorieTarget:
+        type: integer
+      dateOfBirth:
+        type: string
+      displayName:
         type: string
       gender:
         type: string
       goal:
         type: string
-      height_cm:
+      heightCm:
         type: number
       id:
         type: string
-      updated_at:
+      targetCoffeeCups:
+        type: integer
+      targetWaterMl:
+        type: integer
+      targetWeightKg:
+        type: number
+      updatedAt:
         type: string
-      user_id:
+      userId:
         type: string
-      weight_kg:
+      weightKg:
         type: number
     type: object
 host: localhost:8080
@@ -415,6 +492,47 @@ paths:
       summary: Update User Profile
       tags:
       - Profile
+  /api/v1/profiles/onboarding:
+    post:
+      consumes:
+      - application/json
+      description: Sets up the user's profile and preferences in one step
+      parameters:
+      - description: Onboarding Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.OnboardingRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.UserProfile'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Onboarding Profile Setup
+      tags:
+      - Profile
   /api/v1/profiles/preferences:
     get:
       consumes:
@@ -483,6 +601,42 @@ paths:
       security:
       - BearerAuth: []
       summary: Update User Preferences
+      tags:
+      - Profile
+  /api/v1/profiles/weight:
+    put:
+      consumes:
+      - application/json
+      description: Update only the weight for the authenticated user
+      parameters:
+      - description: Update Weight Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.UpdateWeightRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update User Weight
       tags:
       - Profile
 securityDefinitions:

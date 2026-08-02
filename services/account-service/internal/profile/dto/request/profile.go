@@ -6,7 +6,6 @@ type UpdateProfileRequest struct {
 	DateOfBirth   *string  `json:"dateOfBirth,omitempty" validate:"omitempty,datetime=2006-01-02"`
 	Gender        *string  `json:"gender,omitempty"`
 	HeightCm      *float64 `json:"heightCm,omitempty" validate:"omitempty,gt=0"`
-	WeightKg      *float64 `json:"weightKg,omitempty" validate:"omitempty,gt=0"`
 	ActivityLevel *string  `json:"activityLevel,omitempty"`
 	Goal               *string  `json:"goal,omitempty"`
 	Age                *int     `json:"age,omitempty"`
@@ -15,6 +14,10 @@ type UpdateProfileRequest struct {
 	DailyCalorieTarget *int     `json:"dailyCalorieTarget,omitempty"`
 	TargetWaterMl      *int     `json:"targetWaterMl,omitempty"`
 	TargetCoffeeCups   *int     `json:"targetCoffeeCups,omitempty"`
+}
+
+type UpdateWeightRequest struct {
+	WeightKg float64 `json:"weightKg" validate:"required,gt=0"`
 }
 
 type OnboardingRequest struct {
@@ -64,7 +67,6 @@ func (req *UpdateProfileRequest) ToDomain() *model.UpdateProfileRequest {
 		DateOfBirth:   req.DateOfBirth,
 		Gender:        req.Gender,
 		HeightCm:      req.HeightCm,
-		WeightKg:      req.WeightKg,
 		ActivityLevel:      req.ActivityLevel,
 		Goal:               req.Goal,
 		Age:                req.Age,

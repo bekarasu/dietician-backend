@@ -15,6 +15,7 @@ import (
 type IProfileHandler interface {
 	GetProfile(c *fiber.Ctx) error
 	UpsertProfile(c *fiber.Ctx) error
+	UpdateWeight(c *fiber.Ctx) error
 	Onboarding(c *fiber.Ctx) error
 	GetPreferences(c *fiber.Ctx) error
 	UpdatePreferences(c *fiber.Ctx) error
@@ -81,6 +82,39 @@ func (h *ProfileHandler) UpsertProfile(c *fiber.Ctx) error {
 	}
 
 	return pkgresponse.Success(c, "profile updated", profile.ToResource())
+}
+
+// UpdateWeight updates the user's weight (intended for internal/service-to-service use).
+// @Summary Update User Weight
+// @Description Update only the weight for the authenticated user
+// @Tags Profile
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body request.UpdateWeightRequest true "Update Weight Request"
+// @Success 200 {object} pkgresponse.SuccessResponse
+// @Failure 400 {object} pkgresponse.ErrorResponse
+// @Failure 401 {object} pkgresponse.ErrorResponse
+// @Failure 500 {object} pkgresponse.ErrorResponse
+// @Router /api/v1/profiles/weight [put]
+func (h *ProfileHandler) UpdateWeight(c *fiber.Ctx) error {
+	userID := middleware.GetUserID(c.UserContext())
+
+	var req request.UpdateWeightRequest
+	if err := c.BodyParser(&req); err != nil {
+		return pkgresponse.Error(c, fiber.StatusBadRequest, utils.TranslateByIDWithContext(c.UserContext(), constants.InvalidRequestBody))
+	}
+
+	if err := validation.Validate.Struct(req); err != nil {
+		return pkgresponse.Error(c, fiber.StatusBadRequest, validation.FormatValidationError(c.UserContext(), err))
+	}
+
+	err := h.profileOrchestrator.UpdateWeight(c.UserContext(), userID, &model.UpdateWeightRequest{WeightKg: req.WeightKg})
+	if err != nil {
+		return pkgresponse.Error(c, fiber.StatusInternalServerError, err.Error())
+	}
+
+	return pkgresponse.Success(c, "weight updated successfully", nil)
 }
 
 // Onboarding handles the comprehensive onboarding endpoint after registration.
