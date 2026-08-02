@@ -2,9 +2,11 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"time"
 
+	"dietician.local/packages/pdfparser"
 	"dietician.local/services/medical-service/internal/storage"
 	"dietician.local/services/medical-service/internal/uploads/dto/request"
 	"dietician.local/services/medical-service/internal/uploads/dto/response"
@@ -68,9 +70,48 @@ func (s *medicalService) CreateUpload(ctx context.Context, userID string, req re
 			s.logger.WithError(err).Error("Failed to create file metadata")
 			return nil, err
 		}
+		upload.Metadata = append(upload.Metadata, *meta)
+
+		// Parse blood test results from PDF.
+		if req.UploadType == request.BloodTest {
+			s.parseAndStoreResults(ctx, upload, req.File.Data)
+		}
 	}
 
 	return upload, nil
+}
+
+// parseAndStoreResults extracts blood test data from the PDF and saves it.
+// On failure it marks the upload as "parse_failed" but does not return an
+// error — the upload itself is still considered successful.
+func (s *medicalService) parseAndStoreResults(ctx context.Context, upload *repository.MedicalUpload, fileData []byte) {
+	report, err := pdfparser.ParseBloodTestPDF(fileData)
+	if err != nil {
+		s.logger.WithError(err).Error("Failed to parse blood test PDF")
+		_ = s.repo.UpdateStatus(ctx, upload.ID, "parse_failed")
+		upload.Status = "parse_failed"
+		return
+	}
+
+	resultsJSON, err := json.Marshal(report)
+	if err != nil {
+		s.logger.WithError(err).Error("Failed to marshal parsed results")
+		_ = s.repo.UpdateStatus(ctx, upload.ID, "parse_failed")
+		upload.Status = "parse_failed"
+		return
+	}
+
+	if err := s.repo.UpdateParsedResults(ctx, upload.ID, resultsJSON); err != nil {
+		s.logger.WithError(err).Error("Failed to store parsed results")
+		_ = s.repo.UpdateStatus(ctx, upload.ID, "parse_failed")
+		upload.Status = "parse_failed"
+		return
+	}
+
+	rawJSON := json.RawMessage(resultsJSON)
+	upload.ParsedResults = &rawJSON
+	upload.Status = "completed"
+	s.logger.Infof("Successfully parsed blood test with %d results for upload %s", report.TotalTestCount, upload.ID)
 }
 
 func (s *medicalService) ListUploads(ctx context.Context, userID string) ([]repository.MedicalUpload, error) {
