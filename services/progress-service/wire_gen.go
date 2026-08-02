@@ -22,17 +22,18 @@ import (
 	service2 "dietician.local/services/progress-service/internal/tracking/service"
 	"github.com/google/wire"
 	"github.com/jmoiron/sqlx"
+	"github.com/sirupsen/logrus"
 )
 
 // Injectors from wire.go:
 
-func InitRoute(db *sqlx.DB) internal.IRoute {
+func InitRoute(db *sqlx.DB, logger *logrus.Logger) internal.IRoute {
 	iProgressRepository := repository.NewProgressRepository(db)
 	iDailyLogRepository := repository2.NewDailyLogRepository(db)
 	iDailyLogService := service.NewDailyLogService(iDailyLogRepository)
 	iTrackingRepository := repository3.NewTrackingRepository(db)
 	iTrackingService := service2.NewTrackingService(iTrackingRepository)
-	iProgressService := service3.NewProgressService(iProgressRepository, iDailyLogService, iTrackingService)
+	iProgressService := service3.NewProgressService(iProgressRepository, iDailyLogService, iTrackingService, logger)
 	iProgressOrchestrator := orchestration.NewProgressOrchestrator(iProgressService)
 	iProgressHandler := handler.NewProgressHandler(iProgressOrchestrator)
 	iDailyLogOrchestrator := orchestration2.NewDailyLogOrchestrator(iDailyLogService)

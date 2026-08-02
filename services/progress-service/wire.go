@@ -6,6 +6,7 @@ package progressservice
 import (
 	"github.com/google/wire"
 	"github.com/jmoiron/sqlx"
+	"github.com/sirupsen/logrus"
 
 	"dietician.local/services/progress-service/internal"
 	dailylogHandler "dietician.local/services/progress-service/internal/dailylog/handler"
@@ -43,7 +44,7 @@ var trackingSet = wire.NewSet(
 	trackingHandler.NewTrackingHandler,
 )
 
-func InitRoute(db *sqlx.DB) internal.IRoute {
+func InitRoute(db *sqlx.DB, logger *logrus.Logger) internal.IRoute {
 	wire.Build(
 		progressSet,
 		dailylogSet,

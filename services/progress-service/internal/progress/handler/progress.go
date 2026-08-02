@@ -1,9 +1,12 @@
 package handler
 
 import (
+	"fmt"
+
 	"github.com/gofiber/fiber/v2"
 
 	"dietician.local/packages/constants"
+	"dietician.local/packages/middleware"
 	"dietician.local/packages/response"
 	"dietician.local/packages/utils"
 	requestdto "dietician.local/services/progress-service/internal/progress/dto/request"
@@ -35,16 +38,18 @@ func NewProgressHandler(progressOrchestrator orchestration.IProgressOrchestrator
 // @Accept json
 // @Produce json
 // @Security BearerAuth
-// @Param userId path string true "User ID"
 // @Success 200 {object} response.SuccessResponse{data=response.ProgressResponse}
 // @Failure 400 {object} response.ErrorResponse
 // @Failure 500 {object} response.ErrorResponse
-// @Router /api/v1/progress/{userId} [get]
+// @Router /api/v1/progress/me [get]
 func (h *progressHandler) GetProgress(c *fiber.Ctx) error {
-	userID := c.Params("userId")
+	userID := middleware.GetUserID(c.UserContext())
+	fmt.Println(userID)
 
 	progress, err := h.progressOrchestrator.GetProgress(c.Context(), userID)
 	if err != nil {
+		fmt.Println("Error: %s", err)
+
 		return response.Error(c, fiber.StatusInternalServerError, utils.TranslateByIDWithContext(c.UserContext(), constants.FailedToGetProgress))
 	}
 
@@ -58,14 +63,13 @@ func (h *progressHandler) GetProgress(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Security BearerAuth
-// @Param userId path string true "User ID"
 // @Param request body requestdto.AddWeightRequest true "Add Weight Request"
 // @Success 200 {object} response.SuccessResponse{data=repository.WeightLog}
 // @Failure 400 {object} response.ErrorResponse
 // @Failure 500 {object} response.ErrorResponse
-// @Router /api/v1/progress/{userId}/weight [post]
+// @Router /api/v1/progress/me/weight [post]
 func (h *progressHandler) AddWeight(c *fiber.Ctx) error {
-	userID := c.Params("userId")
+	userID := middleware.GetUserID(c.UserContext())
 	var req requestdto.AddWeightRequest
 
 	if err := c.BodyParser(&req); err != nil {
@@ -87,12 +91,11 @@ func (h *progressHandler) AddWeight(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Security BearerAuth
-// @Param userId path string true "User ID"
 // @Success 200 {object} response.SuccessResponse{data=repository.WeeklyProgressSummary}
 // @Failure 500 {object} response.ErrorResponse
-// @Router /api/v1/progress/{userId}/weekly-summary [get]
+// @Router /api/v1/progress/me/weekly-summary [get]
 func (h *progressHandler) GetWeeklySummary(c *fiber.Ctx) error {
-	userID := c.Params("userId")
+	userID := middleware.GetUserID(c.UserContext())
 
 	summary, err := h.progressOrchestrator.GetWeeklySummary(c.Context(), userID)
 	if err != nil {
@@ -109,14 +112,13 @@ func (h *progressHandler) GetWeeklySummary(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Security BearerAuth
-// @Param userId path string true "User ID"
 // @Param request body requestdto.AddHabitRequest true "Add Habit Request"
 // @Success 200 {object} response.SuccessResponse{data=repository.HabitLog}
 // @Failure 400 {object} response.ErrorResponse
 // @Failure 500 {object} response.ErrorResponse
-// @Router /api/v1/progress/{userId}/habits [post]
+// @Router /api/v1/progress/me/habits [post]
 func (h *progressHandler) AddHabit(c *fiber.Ctx) error {
-	userID := c.Params("userId")
+	userID := middleware.GetUserID(c.UserContext())
 	var req requestdto.AddHabitRequest
 
 	if err := c.BodyParser(&req); err != nil {

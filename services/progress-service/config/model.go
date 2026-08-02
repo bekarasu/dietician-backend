@@ -15,3 +15,7 @@ type LanguageConfig struct {
 	Default   language.Tag `mapstructure:"LANGUAGE_DEFAULT"`
 	Languages []language.Tag
 }
+
+type JWTConfig struct {
+	Secret string `mapstructure:"JWT_SECRET"`
+}

@@ -3,8 +3,9 @@ package internal
 import (
 	"github.com/gofiber/fiber/v2"
 
-	"dietician.local/services/progress-service/internal/progress/handler"
+	"dietician.local/packages/middleware"
 	dailylogHandler "dietician.local/services/progress-service/internal/dailylog/handler"
+	"dietician.local/services/progress-service/internal/progress/handler"
 	trackingHandler "dietician.local/services/progress-service/internal/tracking/handler"
 )
 
@@ -37,7 +38,7 @@ func (r *route) SetupRoutes(rc *RouteContext) {
 }
 
 func (r *route) progressRoutes(app *fiber.App) {
-	progressGroup := app.Group("/api/v1/progress/:userId")
+	progressGroup := app.Group("/api/v1/progress/me", middleware.UserAuthMiddleware) 
 
 	progressGroup.Get("/", r.progressHandler.GetProgress)
 	progressGroup.Post("/weight", r.progressHandler.AddWeight)

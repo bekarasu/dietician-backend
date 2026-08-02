@@ -9,7 +9,8 @@ import (
 	"dietician.local/services/progress-service/internal/progress/dto/request"
 	"dietician.local/services/progress-service/internal/progress/dto/response"
 	"dietician.local/services/progress-service/internal/progress/repository"
-	
+	"github.com/sirupsen/logrus"
+
 	dailylog_service "dietician.local/services/progress-service/internal/dailylog/service"
 	tracking_service "dietician.local/services/progress-service/internal/tracking/service"
 )
@@ -25,23 +26,27 @@ type progressService struct {
 	repo         repository.IProgressRepository
 	dlService    dailylog_service.IDailyLogService
 	trackService tracking_service.ITrackingService
+	logger       *logrus.Logger
 }
 
-func NewProgressService(repo repository.IProgressRepository, dlService dailylog_service.IDailyLogService, trackService tracking_service.ITrackingService) IProgressService {
+func NewProgressService(repo repository.IProgressRepository, dlService dailylog_service.IDailyLogService, trackService tracking_service.ITrackingService, l *logrus.Logger) IProgressService {
 	return &progressService{
 		repo:         repo,
 		dlService:    dlService,
 		trackService: trackService,
+		logger:       l,
 	}
 }
 
 func (s *progressService) GetProgress(ctx context.Context, userID string) (*response.ProgressResponse, error) {
 	weights, err := s.repo.GetWeightLogs(ctx, userID)
 	if err != nil {
+		s.logger.WithError(err).Error("Failed to get weight logs")
 		return nil, err
 	}
 	habits, err := s.repo.GetHabitLogs(ctx, userID)
 	if err != nil {
+		s.logger.WithError(err).Error("Failed to get habit logs")
 		return nil, err
 	}
 
@@ -54,11 +59,13 @@ func (s *progressService) GetProgress(ctx context.Context, userID string) (*resp
 
 	dailyLogs, err := s.dlService.GetDailyLogs(ctx, userID)
 	if err != nil {
+		s.logger.WithError(err).Error("Failed to get daily logs")
 		return nil, err
 	}
-	
+
 	trackingMetrics, err := s.trackService.GetTrackingMetrics(ctx, userID)
 	if err != nil {
+		s.logger.WithError(err).Error("Failed to get tracking metrics")
 		return nil, err
 	}
 
@@ -81,13 +88,19 @@ func (s *progressService) AddWeight(ctx context.Context, userID string, req requ
 		Notes:    req.Notes,
 	}
 	if err := s.repo.AddWeightLog(ctx, log); err != nil {
+		s.logger.WithError(err).Error("Failed to add weight log")
 		return nil, err
 	}
 	return log, nil
 }
 
 func (s *progressService) GetWeeklySummary(ctx context.Context, userID string) (*repository.WeeklyProgressSummary, error) {
-	return s.repo.GetWeeklySummary(ctx, userID)
+	summary, err := s.repo.GetWeeklySummary(ctx, userID)
+	if err != nil {
+		s.logger.WithError(err).Error("Failed to get weekly summary")
+		return nil, err
+	}
+	return summary, nil
 }
 
 func (s *progressService) AddHabit(ctx context.Context, userID string, req request.AddHabitRequest) (*repository.HabitLog, error) {
@@ -102,6 +115,7 @@ func (s *progressService) AddHabit(ctx context.Context, userID string, req reque
 		Notes:     req.Notes,
 	}
 	if err := s.repo.AddHabitLog(ctx, log); err != nil {
+		s.logger.WithError(err).Error("Failed to add habit log")
 		return nil, err
 	}
 	return log, nil

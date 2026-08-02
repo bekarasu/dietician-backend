@@ -23,7 +23,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/v1/progress/{userId}": {
+        "/api/v1/progress/me": {
             "get": {
                 "security": [
                     {
@@ -41,15 +41,6 @@ const docTemplate = `{
                     "Progress"
                 ],
                 "summary": "Get Progress History",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "userId",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -84,7 +75,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/progress/{userId}/habits": {
+        "/api/v1/progress/me/habits": {
             "post": {
                 "security": [
                     {
@@ -103,13 +94,6 @@ const docTemplate = `{
                 ],
                 "summary": "Add Habit Log",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "userId",
-                        "in": "path",
-                        "required": true
-                    },
                     {
                         "description": "Add Habit Request",
                         "name": "request",
@@ -154,7 +138,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/progress/{userId}/weekly-summary": {
+        "/api/v1/progress/me/weekly-summary": {
             "get": {
                 "security": [
                     {
@@ -172,15 +156,6 @@ const docTemplate = `{
                     "Progress"
                 ],
                 "summary": "Get Weekly Summary",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "userId",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -209,7 +184,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/progress/{userId}/weight": {
+        "/api/v1/progress/me/weight": {
             "post": {
                 "security": [
                     {
@@ -228,13 +203,6 @@ const docTemplate = `{
                 ],
                 "summary": "Add Weight Log",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "userId",
-                        "in": "path",
-                        "required": true
-                    },
                     {
                         "description": "Add Weight Request",
                         "name": "request",
@@ -287,25 +255,25 @@ const docTemplate = `{
                 "calories": {
                     "type": "integer"
                 },
-                "carbs_g": {
+                "carbsG": {
                     "type": "number"
                 },
-                "fat_g": {
+                "fatG": {
                     "type": "number"
                 },
                 "id": {
                     "type": "string"
                 },
-                "logged_at": {
+                "loggedAt": {
                     "type": "string"
                 },
-                "meal_type": {
+                "mealType": {
                     "type": "string"
                 },
                 "name": {
                     "type": "string"
                 },
-                "protein_g": {
+                "proteinG": {
                     "type": "number"
                 }
             }
@@ -313,13 +281,13 @@ const docTemplate = `{
         "dto.DailyLogResponse": {
             "type": "object",
             "properties": {
-                "exercise_minutes": {
+                "exerciseMinutes": {
                     "type": "integer"
                 },
                 "id": {
                     "type": "string"
                 },
-                "log_date": {
+                "logDate": {
                     "type": "string"
                 },
                 "meals": {
@@ -334,13 +302,13 @@ const docTemplate = `{
                 "notes": {
                     "type": "string"
                 },
-                "sleep_hours": {
+                "sleepHours": {
                     "type": "number"
                 },
-                "user_id": {
+                "userId": {
                     "type": "string"
                 },
-                "water_intake_ml": {
+                "waterIntakeMl": {
                     "type": "integer"
                 }
             }
@@ -348,7 +316,7 @@ const docTemplate = `{
         "dto.TrackingMetricResponse": {
             "type": "object",
             "properties": {
-                "current_value": {
+                "currentValue": {
                     "type": "number"
                 },
                 "deadline": {
@@ -357,16 +325,16 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
-                "metric_type": {
+                "metricType": {
                     "type": "string"
                 },
                 "status": {
                     "type": "string"
                 },
-                "target_value": {
+                "targetValue": {
                     "type": "number"
                 },
-                "user_id": {
+                "userId": {
                     "type": "string"
                 }
             }
@@ -495,7 +463,7 @@ const docTemplate = `{
                 "message": {
                     "type": "string"
                 },
-                "request_id": {
+                "requestId": {
                     "type": "string"
                 }
             }

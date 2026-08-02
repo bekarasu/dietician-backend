@@ -7,10 +7,12 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/jmoiron/sqlx"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
+	"github.com/redis/go-redis/v9"
 	"github.com/sirupsen/logrus"
 
 	"dietician.local/packages/middleware"
 	"dietician.local/packages/swagger"
+	"dietician.local/packages/tokenizer"
 	progressservice "dietician.local/services/progress-service"
 	"dietician.local/services/progress-service/config"
 	_ "dietician.local/services/progress-service/docs"
@@ -22,6 +24,8 @@ type application struct {
 	cfg            *config.ProgressAppScheme
 	languageBundle *i18n.Bundle
 	db             *sqlx.DB
+	rdb            *redis.Client
+	tokenizer      tokenizer.ITokenVerifier
 }
 
 type Server struct {
@@ -42,7 +46,7 @@ func initApplication(a *application) *Server {
 	srv.addHealthCheckRoutes()
 	srv.addCommonMiddleware()
 
-	route := progressservice.InitRoute(a.db)
+	route := progressservice.InitRoute(a.db, a.logger)
 	route.SetupRoutes(&internal.RouteContext{App: srv.srv})
 
 	// Setup Swagger UI

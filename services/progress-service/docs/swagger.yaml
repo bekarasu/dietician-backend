@@ -4,28 +4,28 @@ definitions:
     properties:
       calories:
         type: integer
-      carbs_g:
+      carbsG:
         type: number
-      fat_g:
+      fatG:
         type: number
       id:
         type: string
-      logged_at:
+      loggedAt:
         type: string
-      meal_type:
+      mealType:
         type: string
       name:
         type: string
-      protein_g:
+      proteinG:
         type: number
     type: object
   dto.DailyLogResponse:
     properties:
-      exercise_minutes:
+      exerciseMinutes:
         type: integer
       id:
         type: string
-      log_date:
+      logDate:
         type: string
       meals:
         items:
@@ -35,28 +35,28 @@ definitions:
         type: string
       notes:
         type: string
-      sleep_hours:
+      sleepHours:
         type: number
-      user_id:
+      userId:
         type: string
-      water_intake_ml:
+      waterIntakeMl:
         type: integer
     type: object
   dto.TrackingMetricResponse:
     properties:
-      current_value:
+      currentValue:
         type: number
       deadline:
         type: string
       id:
         type: string
-      metric_type:
+      metricType:
         type: string
       status:
         type: string
-      target_value:
+      targetValue:
         type: number
-      user_id:
+      userId:
         type: string
     type: object
   repository.HabitLog:
@@ -140,7 +140,7 @@ definitions:
         type: string
       message:
         type: string
-      request_id:
+      requestId:
         type: string
     type: object
   response.ProgressResponse:
@@ -181,17 +181,11 @@ info:
   title: Progress Service API
   version: "1.0"
 paths:
-  /api/v1/progress/{userId}:
+  /api/v1/progress/me:
     get:
       consumes:
       - application/json
       description: Retrieve weight logs and habit logs for a specific user
-      parameters:
-      - description: User ID
-        in: path
-        name: userId
-        required: true
-        type: string
       produces:
       - application/json
       responses:
@@ -217,17 +211,12 @@ paths:
       summary: Get Progress History
       tags:
       - Progress
-  /api/v1/progress/{userId}/habits:
+  /api/v1/progress/me/habits:
     post:
       consumes:
       - application/json
       description: Add a new habit log entry for a specific user
       parameters:
-      - description: User ID
-        in: path
-        name: userId
-        required: true
-        type: string
       - description: Add Habit Request
         in: body
         name: request
@@ -259,18 +248,12 @@ paths:
       summary: Add Habit Log
       tags:
       - Progress
-  /api/v1/progress/{userId}/weekly-summary:
+  /api/v1/progress/me/weekly-summary:
     get:
       consumes:
       - application/json
       description: Retrieve the weekly progress summary including weight changes and
         habit completion
-      parameters:
-      - description: User ID
-        in: path
-        name: userId
-        required: true
-        type: string
       produces:
       - application/json
       responses:
@@ -292,17 +275,12 @@ paths:
       summary: Get Weekly Summary
       tags:
       - Progress
-  /api/v1/progress/{userId}/weight:
+  /api/v1/progress/me/weight:
     post:
       consumes:
       - application/json
       description: Add a new weight log entry for a specific user
       parameters:
-      - description: User ID
-        in: path
-        name: userId
-        required: true
-        type: string
       - description: Add Weight Request
         in: body
         name: request
