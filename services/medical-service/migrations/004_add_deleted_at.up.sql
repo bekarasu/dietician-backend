@@ -1,0 +1,1 @@
+ALTER TABLE medical_uploads ADD COLUMN deleted_at TIMESTAMP WITH TIME ZONE;
