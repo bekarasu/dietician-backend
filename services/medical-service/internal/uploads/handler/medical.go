@@ -59,13 +59,13 @@ func (h *medicalHandler) CreateUpload(c *fiber.Ctx) error {
 	// Read file content
 	src, err := file.Open()
 	if err != nil {
-		return response.Error(c, fiber.StatusInternalServerError, utils.TranslateByIDWithContext(c.UserContext(), constants.FailedToOpenFile))
+		return response.Error(c, fiber.StatusInternalServerError, utils.TranslateByIDWithContext(c.UserContext(), constants.FailedToOpenFile), err)
 	}
 	defer src.Close()
 
 	buf := make([]byte, file.Size)
 	if _, err := src.Read(buf); err != nil {
-		return response.Error(c, fiber.StatusInternalServerError, utils.TranslateByIDWithContext(c.UserContext(), constants.FailedToReadFile))
+		return response.Error(c, fiber.StatusInternalServerError, utils.TranslateByIDWithContext(c.UserContext(), constants.FailedToReadFile), err)
 	}
 
 	req.File = &request.FileData{
@@ -77,7 +77,7 @@ func (h *medicalHandler) CreateUpload(c *fiber.Ctx) error {
 
 	res, err := h.medOrchestrator.CreateUpload(c.Context(), userID, req)
 	if err != nil {
-		return response.Error(c, fiber.StatusInternalServerError, utils.TranslateByIDWithContext(c.UserContext(), constants.FailedToCreateUpload))
+		return response.Error(c, fiber.StatusInternalServerError, utils.TranslateByIDWithContext(c.UserContext(), constants.FailedToCreateUpload), err)
 	}
 
 	return response.Success(c, "upload created successfully", res)
@@ -98,7 +98,7 @@ func (h *medicalHandler) ListUploads(c *fiber.Ctx) error {
 
 	res, err := h.medOrchestrator.ListUploads(c.Context(), userID)
 	if err != nil {
-		return response.Error(c, fiber.StatusInternalServerError, utils.TranslateByIDWithContext(c.UserContext(), constants.FailedToListUploads))
+		return response.Error(c, fiber.StatusInternalServerError, utils.TranslateByIDWithContext(c.UserContext(), constants.FailedToListUploads), err)
 	}
 
 	return response.Success(c, "uploads retrieved successfully", res)
@@ -125,7 +125,7 @@ func (h *medicalHandler) GetUploadDetail(c *fiber.Ctx) error {
 
 	res, err := h.medOrchestrator.GetUploadDetail(c.Context(), userID, uploadID)
 	if err != nil {
-		return response.Error(c, fiber.StatusInternalServerError, utils.TranslateByIDWithContext(c.UserContext(), constants.FailedToGetUploadDetails))
+		return response.Error(c, fiber.StatusInternalServerError, utils.TranslateByIDWithContext(c.UserContext(), constants.FailedToGetUploadDetails), err)
 	}
 
 	return response.Success(c, "upload details retrieved successfully", res)
@@ -152,7 +152,7 @@ func (h *medicalHandler) DeleteUpload(c *fiber.Ctx) error {
 
 	err := h.medOrchestrator.DeleteUpload(c.Context(), userID, uploadID)
 	if err != nil {
-		return response.Error(c, fiber.StatusInternalServerError, utils.TranslateByIDWithContext(c.UserContext(), constants.FailedToDeleteUpload))
+		return response.Error(c, fiber.StatusInternalServerError, utils.TranslateByIDWithContext(c.UserContext(), constants.FailedToDeleteUpload), err)
 	}
 
 	return response.Success(c, "upload deleted successfully", nil)
@@ -185,7 +185,7 @@ func (h *medicalHandler) UpdateVisibility(c *fiber.Ctx) error {
 
 	err := h.medOrchestrator.UpdateVisibility(c.Context(), userID, uploadID, req.IsHidden)
 	if err != nil {
-		return response.Error(c, fiber.StatusInternalServerError, utils.TranslateByIDWithContext(c.UserContext(), constants.FailedToUpdateUpload))
+		return response.Error(c, fiber.StatusInternalServerError, utils.TranslateByIDWithContext(c.UserContext(), constants.FailedToUpdateUpload), err)
 	}
 
 	return response.Success(c, "upload visibility updated successfully", nil)

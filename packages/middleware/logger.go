@@ -42,10 +42,19 @@ func LoggerMiddleware(l *logrus.Logger) fiber.Handler {
 			"response": getResponseLogFields(respBody, respStatus, t),
 		}
 
+		if handlerErr := c.Locals("handler_error"); handlerErr != nil {
+			fields["error_trace"] = handlerErr
+		}
+
+		logger := l.WithFields(fields)
 		if nrCtx, ok := c.UserContext().Value(constants.NewrelicContextKey).(context.Context); ok {
-			l.WithContext(nrCtx).WithFields(fields).Info("weblogger")
+			logger = logger.WithContext(nrCtx)
+		}
+
+		if respStatus >= 500 {
+			logger.Error("weblogger")
 		} else {
-			l.WithFields(fields).Info("weblogger")
+			logger.Info("weblogger")
 		}
 
 		return err

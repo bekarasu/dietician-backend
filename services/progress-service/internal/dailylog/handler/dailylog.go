@@ -33,7 +33,7 @@ func (h *dailyLogHandler) CreateDailyLog(c *fiber.Ctx) error {
 
 	res, err := h.orchestrator.CreateDailyLog(c.Context(), req)
 	if err != nil {
-		return response.Error(c, fiber.StatusInternalServerError, utils.TranslateByIDWithContext(c.UserContext(), constants.FailedToCreateDailyLog))
+		return response.Error(c, fiber.StatusInternalServerError, utils.TranslateByIDWithContext(c.UserContext(), constants.FailedToCreateDailyLog), err)
 	}
 	return response.Success(c, "daily log created", res)
 }
@@ -44,7 +44,7 @@ func (h *dailyLogHandler) GetDailyLog(c *fiber.Ctx) error {
 
 	res, err := h.orchestrator.GetDailyLog(c.Context(), userID, date)
 	if err != nil {
-		return response.Error(c, fiber.StatusNotFound, utils.TranslateByIDWithContext(c.UserContext(), constants.DailyLogNotFound))
+		return response.Error(c, fiber.StatusNotFound, utils.TranslateByIDWithContext(c.UserContext(), constants.DailyLogNotFound), err)
 	}
 	return response.Success(c, "daily log retrieved", res)
 }

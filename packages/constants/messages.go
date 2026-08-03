@@ -31,4 +31,6 @@ const (
 	FailedToDeleteUpload            = "failed_to_delete_upload"
 	FailedToParseBloodTest          = "failed_to_parse_blood_test"
 	FailedToUpdateUpload            = "failed_to_update_upload"
+	FailedToAddHabit                = "failed_to_add_habit"
+	FailedToAddWeight               = "failed_to_add_weight"
 )

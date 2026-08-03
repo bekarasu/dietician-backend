@@ -204,7 +204,7 @@ func (h *AuthHandler) Logout(c *fiber.Ctx) error {
 
 	err := h.authOrchestrator.Logout(c.UserContext(), userID, token)
 	if err != nil {
-		return pkgresponse.Error(c, fiber.StatusInternalServerError, err.Error())
+		return pkgresponse.Error(c, fiber.StatusInternalServerError, err.Error(), err)
 	}
 
 	return pkgresponse.Success(c, "logout successful 3", nil)

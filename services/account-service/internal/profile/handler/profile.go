@@ -77,7 +77,7 @@ func (h *ProfileHandler) UpsertProfile(c *fiber.Ctx) error {
 
 	profile, err := h.profileOrchestrator.UpsertProfile(c.UserContext(), userID, req.ToDomain())
 	if err != nil {
-		return pkgresponse.Error(c, fiber.StatusInternalServerError, err.Error())
+		return pkgresponse.Error(c, fiber.StatusInternalServerError, err.Error(), err)
 	}
 
 	return pkgresponse.Success(c, "profile updated", profile.ToResource())
@@ -113,7 +113,7 @@ func (h *ProfileHandler) Onboarding(c *fiber.Ctx) error {
 
 	profile, err := h.profileOrchestrator.Onboarding(c.UserContext(), userID, req.ToDomain())
 	if err != nil {
-		return pkgresponse.Error(c, fiber.StatusInternalServerError, err.Error())
+		return pkgresponse.Error(c, fiber.StatusInternalServerError, err.Error(), err)
 	}
 
 	return pkgresponse.Success(c, "onboarding completed", profile.ToResource())
@@ -135,7 +135,7 @@ func (h *ProfileHandler) GetPreferences(c *fiber.Ctx) error {
 
 	prefs, err := h.profileOrchestrator.GetPreferences(c.UserContext(), userID)
 	if err != nil {
-		return pkgresponse.Error(c, fiber.StatusInternalServerError, err.Error())
+		return pkgresponse.Error(c, fiber.StatusInternalServerError, err.Error(), err)
 	}
 
 	return pkgresponse.Success(c, "preferences fetched", prefs.ToResource())
@@ -171,7 +171,7 @@ func (h *ProfileHandler) UpdatePreferences(c *fiber.Ctx) error {
 
 	prefs, err := h.profileOrchestrator.UpdatePreferences(c.UserContext(), userID, req.ToDomain())
 	if err != nil {
-		return pkgresponse.Error(c, fiber.StatusInternalServerError, err.Error())
+		return pkgresponse.Error(c, fiber.StatusInternalServerError, err.Error(), err)
 	}
 
 	return pkgresponse.Success(c, "preferences updated", prefs.ToResource())

@@ -31,7 +31,7 @@ func (h *trackingHandler) CreateTrackingMetric(c *fiber.Ctx) error {
 
 	res, err := h.orchestrator.CreateTrackingMetric(c.Context(), req)
 	if err != nil {
-		return response.Error(c, fiber.StatusInternalServerError, utils.TranslateByIDWithContext(c.UserContext(), constants.FailedToCreateTrackingMetric))
+		return response.Error(c, fiber.StatusInternalServerError, utils.TranslateByIDWithContext(c.UserContext(), constants.FailedToCreateTrackingMetric), err)
 	}
 
 	return response.Success(c, "tracking metric created", res)
@@ -42,7 +42,7 @@ func (h *trackingHandler) GetTrackingMetrics(c *fiber.Ctx) error {
 
 	res, err := h.orchestrator.GetTrackingMetrics(c.Context(), userID)
 	if err != nil {
-		return response.Error(c, fiber.StatusInternalServerError, utils.TranslateByIDWithContext(c.UserContext(), constants.FailedToGetTrackingMetrics))
+		return response.Error(c, fiber.StatusInternalServerError, utils.TranslateByIDWithContext(c.UserContext(), constants.FailedToGetTrackingMetrics), err)
 	}
 
 	return response.Success(c, "tracking metrics retrieved", res)

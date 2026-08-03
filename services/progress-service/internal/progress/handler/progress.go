@@ -48,9 +48,7 @@ func (h *progressHandler) GetProgress(c *fiber.Ctx) error {
 
 	progress, err := h.progressOrchestrator.GetProgress(c.Context(), userID)
 	if err != nil {
-		fmt.Println("Error: %s", err)
-
-		return response.Error(c, fiber.StatusInternalServerError, utils.TranslateByIDWithContext(c.UserContext(), constants.FailedToGetProgress))
+		return response.Error(c, fiber.StatusInternalServerError, utils.TranslateByIDWithContext(c.UserContext(), constants.FailedToGetProgress), err)
 	}
 
 	return response.Success(c, "progress retrieved successfully", progress)
@@ -80,7 +78,7 @@ func (h *progressHandler) AddWeight(c *fiber.Ctx) error {
 
 	log, err := h.progressOrchestrator.AddWeight(c.Context(), userID, req, token)
 	if err != nil {
-		return response.Error(c, fiber.StatusBadRequest, err.Error())
+		return response.Error(c, fiber.StatusInternalServerError, utils.TranslateByIDWithContext(c.UserContext(), constants.FailedToAddWeight), err)
 	}
 
 	return response.Success(c, "weight log added successfully", log)
@@ -101,7 +99,7 @@ func (h *progressHandler) GetWeeklySummary(c *fiber.Ctx) error {
 
 	summary, err := h.progressOrchestrator.GetWeeklySummary(c.Context(), userID)
 	if err != nil {
-		return response.Error(c, fiber.StatusInternalServerError, utils.TranslateByIDWithContext(c.UserContext(), constants.FailedToGetWeeklySummary))
+		return response.Error(c, fiber.StatusInternalServerError, utils.TranslateByIDWithContext(c.UserContext(), constants.FailedToGetWeeklySummary), err)
 	}
 
 	return response.Success(c, "weekly summary retrieved successfully", summary)
@@ -129,7 +127,7 @@ func (h *progressHandler) AddHabit(c *fiber.Ctx) error {
 
 	log, err := h.progressOrchestrator.AddHabit(c.Context(), userID, req)
 	if err != nil {
-		return response.Error(c, fiber.StatusBadRequest, err.Error())
+		return response.Error(c, fiber.StatusInternalServerError, utils.TranslateByIDWithContext(c.UserContext(), constants.FailedToAddHabit), err)
 	}
 
 	return response.Success(c, "habit log added successfully", log)

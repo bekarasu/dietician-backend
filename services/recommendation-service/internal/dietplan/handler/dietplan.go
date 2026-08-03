@@ -44,7 +44,7 @@ func (h *dietPlanHandler) CreateDietPlan(c *fiber.Ctx) error {
 
 	res, err := h.orchestrator.CreateDietPlan(c.Context(), req)
 	if err != nil {
-		return response.Error(c, fiber.StatusInternalServerError, utils.TranslateByIDWithContext(c.UserContext(), constants.FailedToCreateDietPlan))
+		return response.Error(c, fiber.StatusInternalServerError, utils.TranslateByIDWithContext(c.UserContext(), constants.FailedToCreateDietPlan), err)
 	}
 
 	return response.Success(c, "diet plan created successfully", res)

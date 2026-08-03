@@ -44,7 +44,7 @@ func (h *recommendationHandler) CreateDietRecommendations(c *fiber.Ctx) error {
 
 	res, err := h.recoOrchestrator.CreateDietRecommendations(c.Context(), req)
 	if err != nil {
-		return response.Error(c, fiber.StatusInternalServerError, utils.TranslateByIDWithContext(c.UserContext(), constants.FailedToGenerateRecommendations))
+		return response.Error(c, fiber.StatusInternalServerError, utils.TranslateByIDWithContext(c.UserContext(), constants.FailedToGenerateRecommendations), err)
 	}
 
 	return response.Success(c, "recommendations generated successfully", res)
