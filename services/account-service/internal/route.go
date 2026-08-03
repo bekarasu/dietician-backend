@@ -51,7 +51,6 @@ func (r *route) profileRoutes(app *fiber.App) {
 
 	profileGroup.Get("/", r.profileHandler.GetProfile)
 	profileGroup.Put("/", r.profileHandler.UpsertProfile)
-	profileGroup.Put("/weight", r.profileHandler.UpdateWeight)
 	profileGroup.Post("/onboarding", r.profileHandler.Onboarding)
 	profileGroup.Get("/preferences", r.profileHandler.GetPreferences)
 	profileGroup.Put("/preferences", r.profileHandler.UpdatePreferences)

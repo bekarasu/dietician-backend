@@ -10,7 +10,6 @@ import (
 type IProfileOrchestrator interface {
 	GetProfile(ctx context.Context, userID string) (*model.UserProfile, error)
 	UpsertProfile(ctx context.Context, userID string, req *model.UpdateProfileRequest) (*model.UserProfile, error)
-	UpdateWeight(ctx context.Context, userID string, req *model.UpdateWeightRequest) error
 	Onboarding(ctx context.Context, userID string, req *model.OnboardingRequest) (*model.UserProfile, error)
 	GetPreferences(ctx context.Context, userID string) (*model.PreferencesResponse, error)
 	UpdatePreferences(ctx context.Context, userID string, req *model.UpdatePreferencesRequest) (*model.PreferencesResponse, error)
@@ -30,10 +29,6 @@ func (o *profileOrchestrator) GetProfile(ctx context.Context, userID string) (*m
 
 func (o *profileOrchestrator) UpsertProfile(ctx context.Context, userID string, req *model.UpdateProfileRequest) (*model.UserProfile, error) {
 	return o.profileService.UpsertProfile(ctx, userID, req)
-}
-
-func (o *profileOrchestrator) UpdateWeight(ctx context.Context, userID string, req *model.UpdateWeightRequest) error {
-	return o.profileService.UpdateWeight(ctx, userID, req.WeightKg)
 }
 
 func (o *profileOrchestrator) Onboarding(ctx context.Context, userID string, req *model.OnboardingRequest) (*model.UserProfile, error) {

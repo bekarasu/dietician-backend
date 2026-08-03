@@ -9,6 +9,8 @@ ifneq (,$(filter $(firstword $(MAKECMDGOALS)),up-dev up-infra))
   $(eval $(RUN_ARGS):;@:)
 endif
 
+# example: make up-infra -- -d
+
 up-dev:
 	docker compose -f docker-compose.dev.yml up $(RUN_ARGS)
 

@@ -3,10 +3,10 @@ package request
 import "dietician.local/services/account-service/internal/profile/model"
 
 type UpdateProfileRequest struct {
-	DateOfBirth   *string  `json:"dateOfBirth,omitempty" validate:"omitempty,datetime=2006-01-02"`
-	Gender        *string  `json:"gender,omitempty"`
-	HeightCm      *float64 `json:"heightCm,omitempty" validate:"omitempty,gt=0"`
-	ActivityLevel *string  `json:"activityLevel,omitempty"`
+	DateOfBirth        *string  `json:"dateOfBirth,omitempty" validate:"omitempty,datetime=2006-01-02"`
+	Gender             *string  `json:"gender,omitempty"`
+	HeightCm           *float64 `json:"heightCm,omitempty" validate:"omitempty,gt=0"`
+	ActivityLevel      *string  `json:"activityLevel,omitempty"`
 	Goal               *string  `json:"goal,omitempty"`
 	Age                *int     `json:"age,omitempty"`
 	DisplayName        *string  `json:"displayName,omitempty"`
@@ -64,9 +64,9 @@ func (req *UpdatePreferencesRequest) ToDomain() *model.UpdatePreferencesRequest 
 
 func (req *UpdateProfileRequest) ToDomain() *model.UpdateProfileRequest {
 	return &model.UpdateProfileRequest{
-		DateOfBirth:   req.DateOfBirth,
-		Gender:        req.Gender,
-		HeightCm:      req.HeightCm,
+		DateOfBirth:        req.DateOfBirth,
+		Gender:             req.Gender,
+		HeightCm:           req.HeightCm,
 		ActivityLevel:      req.ActivityLevel,
 		Goal:               req.Goal,
 		Age:                req.Age,
@@ -83,7 +83,6 @@ func (req *OnboardingRequest) ToDomain() *model.OnboardingRequest {
 		Name:               req.Name,
 		Age:                req.Age,
 		HeightCm:           req.HeightCm,
-		WeightKg:           req.WeightKg,
 		TargetWeightKg:     req.TargetWeightKg,
 		Gender:             req.Gender,
 		ActivityLevel:      req.ActivityLevel,

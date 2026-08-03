@@ -36,7 +36,6 @@ func (s *ProfileService) UpsertProfile(ctx context.Context, userID string, req *
 		DateOfBirth:   req.DateOfBirth,
 		Gender:        req.Gender,
 		HeightCm:      req.HeightCm,
-		WeightKg:      req.WeightKg,
 		ActivityLevel: req.ActivityLevel,
 		Goal:          req.Goal,
 	}
@@ -44,10 +43,6 @@ func (s *ProfileService) UpsertProfile(ctx context.Context, userID string, req *
 		return nil, err
 	}
 	return s.repo.GetByUserID(ctx, userID)
-}
-
-func (s *ProfileService) UpdateWeight(ctx context.Context, userID string, weightKg float64) error {
-	return s.repo.UpdateWeight(ctx, userID, weightKg)
 }
 
 func (s *ProfileService) Onboarding(ctx context.Context, userID string, req *model.OnboardingRequest) (*model.UserProfile, error) {
@@ -82,7 +77,6 @@ func (s *ProfileService) Onboarding(ctx context.Context, userID string, req *mod
 		Gender:             &req.Gender,
 		ActivityLevel:      &req.ActivityLevel,
 		HeightCm:           &req.HeightCm,
-		WeightKg:           &req.WeightKg,
 		TargetWeightKg:     &req.TargetWeightKg,
 		Goal:               &req.GoalType,
 		DailyCalorieTarget: req.DailyCalorieTarget,
