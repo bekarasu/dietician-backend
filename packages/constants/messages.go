@@ -30,4 +30,5 @@ const (
 	FailedToGetUploadDetails        = "failed_to_get_upload_details"
 	FailedToDeleteUpload            = "failed_to_delete_upload"
 	FailedToParseBloodTest          = "failed_to_parse_blood_test"
+	FailedToUpdateUpload            = "failed_to_update_upload"
 )

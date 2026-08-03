@@ -1,0 +1,1 @@
+ALTER TABLE medical_uploads ADD COLUMN is_hidden BOOLEAN DEFAULT FALSE;

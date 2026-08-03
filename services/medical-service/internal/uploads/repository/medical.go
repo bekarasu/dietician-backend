@@ -17,6 +17,7 @@ type MedicalUpload struct {
 	Status        string                `db:"status" json:"status"`
 	ParsedResults *json.RawMessage      `db:"parsed_results" json:"parsedResults,omitempty"`
 	ParsedAt      *time.Time            `db:"parsed_at" json:"parsedAt,omitempty"`
+	IsHidden      bool                  `db:"is_hidden" json:"isHidden"`
 	CreatedAt     time.Time             `db:"created_at" json:"createdAt"`
 	UpdatedAt     time.Time             `db:"updated_at" json:"updatedAt"`
 	Metadata      []MedicalFileMetadata `db:"-" json:"metadata"`
@@ -41,6 +42,7 @@ type IMedicalRepository interface {
 	GetFileMetadataByUploadID(ctx context.Context, uploadID string) ([]MedicalFileMetadata, error)
 	UpdateParsedResults(ctx context.Context, uploadID string, results json.RawMessage) error
 	UpdateStatus(ctx context.Context, uploadID string, status string) error
+	UpdateVisibility(ctx context.Context, uploadID string, isHidden bool) error
 }
 
 type medicalRepository struct {
@@ -59,7 +61,7 @@ func (r *medicalRepository) CreateUpload(ctx context.Context, upload *MedicalUpl
 
 func (r *medicalRepository) GetUploadsByUserID(ctx context.Context, userID string) ([]MedicalUpload, error) {
 	var uploads []MedicalUpload
-	query := `SELECT id, user_id, upload_type, title, description, status, parsed_results, parsed_at, created_at, updated_at FROM medical_uploads WHERE user_id = $1 ORDER BY created_at DESC`
+	query := `SELECT id, user_id, upload_type, title, description, status, parsed_results, parsed_at, is_hidden, created_at, updated_at FROM medical_uploads WHERE user_id = $1 ORDER BY created_at DESC`
 	if err := r.db.SelectContext(ctx, &uploads, query, userID); err != nil {
 		return nil, err
 	}
@@ -78,7 +80,7 @@ func (r *medicalRepository) GetUploadsByUserID(ctx context.Context, userID strin
 
 func (r *medicalRepository) GetUploadByID(ctx context.Context, uploadID string) (*MedicalUpload, error) {
 	var upload MedicalUpload
-	query := `SELECT id, user_id, upload_type, title, description, status, parsed_results, parsed_at, created_at, updated_at FROM medical_uploads WHERE id = $1`
+	query := `SELECT id, user_id, upload_type, title, description, status, parsed_results, parsed_at, is_hidden, created_at, updated_at FROM medical_uploads WHERE id = $1`
 	if err := r.db.GetContext(ctx, &upload, query, uploadID); err != nil {
 		return nil, err
 	}
@@ -121,5 +123,11 @@ func (r *medicalRepository) UpdateParsedResults(ctx context.Context, uploadID st
 func (r *medicalRepository) UpdateStatus(ctx context.Context, uploadID string, status string) error {
 	query := `UPDATE medical_uploads SET status = $1 WHERE id = $2`
 	_, err := r.db.ExecContext(ctx, query, status, uploadID)
+	return err
+}
+
+func (r *medicalRepository) UpdateVisibility(ctx context.Context, uploadID string, isHidden bool) error {
+	query := `UPDATE medical_uploads SET is_hidden = $1 WHERE id = $2`
+	_, err := r.db.ExecContext(ctx, query, isHidden, uploadID)
 	return err
 }

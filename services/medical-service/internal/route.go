@@ -36,4 +36,5 @@ func (r *route) medicalRoutes(app *fiber.App) {
 	medicalGroup.Get("/", r.medicalHandler.ListUploads)
 	medicalGroup.Get("/:uploadId", r.medicalHandler.GetUploadDetail)
 	medicalGroup.Delete("/:uploadId", r.medicalHandler.DeleteUpload)
+	medicalGroup.Patch("/:uploadId/visibility", r.medicalHandler.UpdateVisibility)
 }

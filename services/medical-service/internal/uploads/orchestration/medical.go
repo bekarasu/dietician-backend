@@ -14,6 +14,7 @@ type IMedicalOrchestrator interface {
 	ListUploads(ctx context.Context, userID string) ([]repository.MedicalUpload, error)
 	GetUploadDetail(ctx context.Context, userID string, uploadID string) (*response.UploadDetailResponse, error)
 	DeleteUpload(ctx context.Context, userID string, uploadID string) error
+	UpdateVisibility(ctx context.Context, userID string, uploadID string, isHidden bool) error
 }
 
 type medicalOrchestrator struct {
@@ -38,4 +39,13 @@ func (o *medicalOrchestrator) GetUploadDetail(ctx context.Context, userID string
 
 func (o *medicalOrchestrator) DeleteUpload(ctx context.Context, userID string, uploadID string) error {
 	return o.medService.DeleteUpload(ctx, userID, uploadID)
+}
+
+func (o *medicalOrchestrator) UpdateVisibility(ctx context.Context, userID string, uploadID string, isHidden bool) error {
+	// Optionally check if the user owns the upload
+	_, err := o.medService.GetUploadDetail(ctx, userID, uploadID)
+	if err != nil {
+		return err
+	}
+	return o.medService.UpdateVisibility(ctx, uploadID, isHidden)
 }

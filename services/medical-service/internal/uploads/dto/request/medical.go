@@ -17,3 +17,7 @@ type CreateUploadRequest struct {
 	UploadType  UploadType `json:"uploadType" validate:"required,oneof=BloodTest"`
 	File        *FileData  `json:"-" validate:"required"`
 }
+
+type UpdateVisibilityRequest struct {
+	IsHidden bool `json:"isHidden"`
+}

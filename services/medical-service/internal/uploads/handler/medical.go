@@ -17,6 +17,7 @@ type IMedicalHandler interface {
 	ListUploads(c *fiber.Ctx) error
 	GetUploadDetail(c *fiber.Ctx) error
 	DeleteUpload(c *fiber.Ctx) error
+	UpdateVisibility(c *fiber.Ctx) error
 }
 
 type medicalHandler struct {
@@ -155,4 +156,37 @@ func (h *medicalHandler) DeleteUpload(c *fiber.Ctx) error {
 	}
 
 	return response.Success(c, "upload deleted successfully", nil)
+}
+
+// UpdateVisibility updates the visibility of a medical upload.
+// @Summary Update Medical Upload Visibility
+// @Description Hide or unhide a medical upload
+// @Tags Medical Uploads
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param uploadId path int true "Upload ID"
+// @Param request body request.UpdateVisibilityRequest true "Visibility Status"
+// @Success 200 {object} response.SuccessResponse
+// @Failure 400 {object} response.ErrorResponse
+// @Failure 500 {object} response.ErrorResponse
+// @Router /api/v1/uploads/{uploadId}/visibility [patch]
+func (h *medicalHandler) UpdateVisibility(c *fiber.Ctx) error {
+	userID := middleware.GetUserID(c.UserContext())
+	uploadID := c.Params("uploadId")
+	if uploadID == "" {
+		return response.Error(c, fiber.StatusBadRequest, utils.TranslateByIDWithContext(c.UserContext(), constants.InvalidUploadID))
+	}
+
+	var req request.UpdateVisibilityRequest
+	if err := c.BodyParser(&req); err != nil {
+		return response.Error(c, fiber.StatusBadRequest, utils.TranslateByIDWithContext(c.UserContext(), constants.InvalidRequestBody))
+	}
+
+	err := h.medOrchestrator.UpdateVisibility(c.Context(), userID, uploadID, req.IsHidden)
+	if err != nil {
+		return response.Error(c, fiber.StatusInternalServerError, utils.TranslateByIDWithContext(c.UserContext(), constants.FailedToUpdateUpload))
+	}
+
+	return response.Success(c, "upload visibility updated successfully", nil)
 }

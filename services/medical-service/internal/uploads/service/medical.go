@@ -19,6 +19,7 @@ type IMedicalService interface {
 	ListUploads(ctx context.Context, userID string) ([]repository.MedicalUpload, error)
 	GetUploadDetail(ctx context.Context, userID string, uploadID string) (*response.UploadDetailResponse, error)
 	DeleteUpload(ctx context.Context, userID string, uploadID string) error
+	UpdateVisibility(ctx context.Context, uploadID string, isHidden bool) error
 }
 
 type medicalService struct {
@@ -145,3 +146,8 @@ func (s *medicalService) DeleteUpload(ctx context.Context, userID string, upload
 
 	return s.repo.DeleteUpload(ctx, uploadID)
 }
+
+func (s *medicalService) UpdateVisibility(ctx context.Context, uploadID string, isHidden bool) error {
+	return s.repo.UpdateVisibility(ctx, uploadID, isHidden)
+}
+
