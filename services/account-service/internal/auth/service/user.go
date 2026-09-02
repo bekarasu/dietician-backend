@@ -193,6 +193,7 @@ func (s *UserService) Refresh(ctx context.Context, req model.RefreshRequest) (*m
 		return nil, err
 	}
 	if user == nil {
+		_ = s.Logout(ctx, rt.UserID, "")
 		return nil, errors.New(utils.TranslateByIDWithContext(ctx, constants.UserNotFound))
 	}
 

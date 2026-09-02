@@ -11,14 +11,14 @@ import (
 	"dietician.local/packages/tokenizer"
 	"dietician.local/services/account-service/config"
 	"dietician.local/services/account-service/internal"
-	authrepository "dietician.local/services/account-service/internal/auth/repository"
-	authservice "dietician.local/services/account-service/internal/auth/service"
 	authhandler "dietician.local/services/account-service/internal/auth/handler"
 	authorchestrator "dietician.local/services/account-service/internal/auth/orchestration"
+	authrepository "dietician.local/services/account-service/internal/auth/repository"
+	authservice "dietician.local/services/account-service/internal/auth/service"
 	profilehandler "dietician.local/services/account-service/internal/profile/handler"
+	profileorchestrator "dietician.local/services/account-service/internal/profile/orchestration"
 	profilerepository "dietician.local/services/account-service/internal/profile/repository"
 	profileservice "dietician.local/services/account-service/internal/profile/service"
-	profileorchestrator "dietician.local/services/account-service/internal/profile/orchestration"
 )
 
 // authSet wires authentication dependencies

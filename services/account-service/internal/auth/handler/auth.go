@@ -207,5 +207,5 @@ func (h *AuthHandler) Logout(c *fiber.Ctx) error {
 		return pkgresponse.Error(c, fiber.StatusInternalServerError, err.Error(), err)
 	}
 
-	return pkgresponse.Success(c, "logout successful 3", nil)
+	return pkgresponse.Success(c, "logout successful", nil)
 }

@@ -30,7 +30,7 @@ func InitRoute(db *sqlx.DB, cfg *config.AccountAppScheme, sender service.EmailSe
 	iUserRepository := repository.NewUserRepository(db)
 	iRefreshTokenRepo := repository.NewRefreshTokenRepository(db)
 	iRefreshTokenService := service.NewRefreshTokenService(cfg, iRefreshTokenRepo, tok)
-	iotpRepository := repository.NewOTPRepository(db)
+	iotpRepository := repository.NewOTPRepository(rdb)
 	iotpService := service.NewOTPService(sender, cfg, iotpRepository)
 	iUserService := service.NewUserService(iUserRepository, iRefreshTokenService, iotpService, tok)
 	iAuthOrchestrator := orchestration.NewAuthOrchestrator(iUserService)

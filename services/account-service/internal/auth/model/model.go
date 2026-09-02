@@ -14,11 +14,11 @@ type User struct {
 }
 
 type OTP struct {
-	ID        string    `db:"id" json:"id"`
-	Email     string    `db:"email" json:"email"`
-	OTPCode   string    `db:"otp_code" json:"otpCode"`
-	ExpiresAt time.Time `db:"expires_at" json:"expiresAt"`
-	CreatedAt time.Time `db:"created_at" json:"createdAt"`
+	ID        string    `json:"id"`
+	Email     string    `json:"email"`
+	OTPCode   string    `json:"otpCode"`
+	ExpiresAt time.Time `json:"expiresAt"`
+	CreatedAt time.Time `json:"createdAt"`
 }
 
 type RefreshToken struct {

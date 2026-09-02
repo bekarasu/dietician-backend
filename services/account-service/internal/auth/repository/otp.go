@@ -2,10 +2,11 @@ package repository
 
 import (
 	"context"
-	"database/sql"
+	"encoding/json"
+	"time"
 
 	"dietician.local/services/account-service/internal/auth/model"
-	"github.com/jmoiron/sqlx"
+	"github.com/redis/go-redis/v9"
 )
 
 type IOTPRepository interface {
@@ -15,33 +16,39 @@ type IOTPRepository interface {
 }
 
 type OTPRepository struct {
-	db *sqlx.DB
+	rdb *redis.Client
 }
 
-func NewOTPRepository(db *sqlx.DB) IOTPRepository {
-	return &OTPRepository{db: db}
+func NewOTPRepository(rdb *redis.Client) IOTPRepository {
+	return &OTPRepository{rdb: rdb}
 }
 
 func (r *OTPRepository) Create(ctx context.Context, otp *model.OTP) error {
-	query := `INSERT INTO otps (email, otp_code, expires_at)
-		VALUES ($1, $2, $3) RETURNING id, created_at`
-	return r.db.QueryRowContext(ctx, query,
-		otp.Email, otp.OTPCode, otp.ExpiresAt,
-	).Scan(&otp.ID, &otp.CreatedAt)
+	data, err := json.Marshal(otp)
+	if err != nil {
+		return err
+	}
+	expiration := time.Until(otp.ExpiresAt)
+	if expiration <= 0 {
+		expiration = 5 * time.Minute
+	}
+	return r.rdb.Set(ctx, "otp:"+otp.Email, data, expiration).Err()
 }
 
 func (r *OTPRepository) GetLatestByEmail(ctx context.Context, email string) (*model.OTP, error) {
-	var otp model.OTP
-	query := `SELECT id, email, otp_code, expires_at, created_at
-		FROM otps WHERE email = $1 ORDER BY created_at DESC LIMIT 1`
-	err := r.db.GetContext(ctx, &otp, query, email)
-	if err == sql.ErrNoRows {
+	data, err := r.rdb.Get(ctx, "otp:"+email).Bytes()
+	if err == redis.Nil {
 		return nil, nil
+	} else if err != nil {
+		return nil, err
 	}
-	return &otp, err
+	var otp model.OTP
+	if err := json.Unmarshal(data, &otp); err != nil {
+		return nil, err
+	}
+	return &otp, nil
 }
 
 func (r *OTPRepository) DeleteByEmail(ctx context.Context, email string) error {
-	_, err := r.db.ExecContext(ctx, `DELETE FROM otps WHERE email = $1`, email)
-	return err
+	return r.rdb.Del(ctx, "otp:"+email).Err()
 }
